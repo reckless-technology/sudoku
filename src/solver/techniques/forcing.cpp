@@ -148,7 +148,7 @@ std::optional<Step> ForcingChain(const Grid &grid)
         }
         if (!eliminations.empty())
         {
-            // "removes 3 from r1c1" as "remove 3 from r1c1": the singles remove.
+            // "removes 3 from a9" as "remove 3 from a9": the singles remove.
             std::string removes     = Removes(eliminations);
             std::string description = "Forcing chain: whichever of " + choice_text + " " + name +
                                       " takes, the singles that follow remove" + removes.substr(7);

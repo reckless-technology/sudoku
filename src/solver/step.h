@@ -57,7 +57,7 @@ struct Candidate
     int cell{0};  ///< The square.
     int digit{0}; ///< The digit.
 
-    /** @return "r4c7=5". */
+    /** @return "g6=5". */
     std::string Text() const;
 
     /**
@@ -85,7 +85,7 @@ struct Step
 
 /**
  * @param eliminations Candidates struck.
- * @return Them in words, by digit, each digit's squares in order: "removes 3 from r4c1, r4c9 and 7 from r4c1";
+ * @return Them in words, by digit, each digit's squares in order: "removes 3 from a6, i6 and 7 from a6";
  * "removes nothing" for none.
  */
 std::string Removes(std::span<const Candidate> eliminations);

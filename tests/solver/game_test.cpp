@@ -79,7 +79,7 @@ TEST(Game, ClashingGivensAreNamedAndTheSolverWaitsForThem)
     game.SetGiven(geometry::Cell(0, 0), 5);
     game.SetGiven(geometry::Cell(0, 8), 5);
     EXPECT_EQ(game.clashes(), (std::vector<int>{geometry::Cell(0, 0), geometry::Cell(0, 8)}));
-    EXPECT_EQ(game.Contradiction(), "5 is twice in row 1 (r1c1, r1c9)");
+    EXPECT_EQ(game.Contradiction(), "5 is twice in row 9 (a9, i9)");
     EXPECT_TRUE(game.Clue().empty());
     EXPECT_TRUE(game.Solve().empty());
     EXPECT_EQ(game.Candidates(geometry::Cell(4, 4)), 0);
@@ -91,14 +91,14 @@ TEST(Game, ClashingGivensAreNamedAndTheSolverWaitsForThem)
 TEST(Game, GivensThatClashWithNothingButLeaveNoWayAreNamedToo)
 {
     Game game;
-    // Row 1 holds 1 to 8 and r2c9 is 9: r1c9 can be nothing.
+    // Row 9 holds 1 to 8 and i8 is 9: i9 can be nothing.
     for (int column = 0; column < 8; column++)
     {
         game.SetGiven(geometry::Cell(0, column), column + 1);
     }
     game.SetGiven(geometry::Cell(1, 8), 9);
     EXPECT_TRUE(game.clashes().empty());
-    EXPECT_EQ(game.Contradiction(), "r1c9 has no digit left");
+    EXPECT_EQ(game.Contradiction(), "i9 has no digit left");
     EXPECT_EQ(game.CountSolutions(), SolutionCount::kNone);
 }
 

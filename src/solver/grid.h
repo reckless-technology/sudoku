@@ -103,7 +103,7 @@ class Grid
     /**
      * The first thing that makes the board impossible, looked for in this order: a digit twice in a unit (the units in
      * Units' order), an empty square with no candidate, a digit with no place left in a unit.
-     * @return What it is, in words - "5 is twice in row 1 (r1c1, r1c9)", "r1c9 has no digit left", "7 has no place left
+     * @return What it is, in words - "5 is twice in row 9 (a9, i9)", "i9 has no digit left", "7 has no place left
      * in box 3"; none for none.
      */
     std::optional<std::string> FindContradiction() const;

@@ -200,7 +200,7 @@ class Views : public ::testing::Test
     TestHost host_; ///< The views' host.
 };
 
-/** A board view 600 x 600: the board 552 across from (24, 24), each square 552 / 9 across. */
+/** A board view 600 x 600: the board 528 across from (36, 36), each square 528 / 9 across. */
 class Board : public Views
 {
   protected:
@@ -215,9 +215,9 @@ class Board : public Views
     /** @param cell A square. @return The view's point at its middle. */
     static reckless::gfx::PointF Middle(int cell)
     {
-        const float side = 552.0f / 9.0f;
-        return {24.0f + (static_cast<float>(geometry::Column(cell)) + 0.5f) * side,
-                24.0f + (static_cast<float>(geometry::Row(cell)) + 0.5f) * side};
+        const float side = 528.0f / 9.0f;
+        return {36.0f + (static_cast<float>(geometry::Column(cell)) + 0.5f) * side,
+                36.0f + (static_cast<float>(geometry::Row(cell)) + 0.5f) * side};
     }
 
     BoardView              board_;    ///< The board.
@@ -228,13 +228,13 @@ class Board : public Views
 TEST_F(Board, FitsTheLargestSquareItsViewHoldsCentred)
 {
     const reckless::gfx::RectF area = board_.BoardArea();
-    EXPECT_FLOAT_EQ(area.x(), 24.0f);
-    EXPECT_FLOAT_EQ(area.width(), 552.0f);
+    EXPECT_FLOAT_EQ(area.x(), 36.0f);
+    EXPECT_FLOAT_EQ(area.width(), 528.0f);
     board_.SetBounds({0, 0, 900, 600});
     const reckless::gfx::RectF wide = board_.BoardArea();
-    EXPECT_FLOAT_EQ(wide.width(), 552.0f);
-    EXPECT_FLOAT_EQ(wide.x(), 174.0f);
-    EXPECT_FLOAT_EQ(wide.y(), 24.0f);
+    EXPECT_FLOAT_EQ(wide.width(), 528.0f);
+    EXPECT_FLOAT_EQ(wide.x(), 186.0f);
+    EXPECT_FLOAT_EQ(wide.y(), 36.0f);
     board_.SetBounds({0, 0, 30, 30});
     EXPECT_FLOAT_EQ(board_.BoardArea().width(), 0.0f);
     EXPECT_EQ(board_.CellAt({15.0f, 15.0f}), -1);
@@ -248,8 +248,9 @@ TEST_F(Board, FindsTheSquareUnderAPoint)
         EXPECT_EQ(board_.CellAt(middle), cell);
     }
     EXPECT_EQ(board_.CellAt({10.0f, 300.0f}), -1) << "the margin";
-    EXPECT_EQ(board_.CellAt({300.0f, 590.0f}), -1);
-    EXPECT_EQ(board_.CellAt({575.9f, 575.9f}), 80) << "the last pixel";
+    EXPECT_EQ(board_.CellAt({300.0f, 580.0f}), -1) << "the columns' letters";
+    EXPECT_EQ(board_.CellAt({20.0f, 300.0f}), -1) << "the rows' numbers";
+    EXPECT_EQ(board_.CellAt({563.9f, 563.9f}), 80) << "the last pixel";
 }
 
 TEST_F(Board, AClickChoosesTheSquareUnderIt)
@@ -400,7 +401,7 @@ TEST_F(Views, ThePanelTellsEveryPlateAndDimsWhatCannotBeDone)
     EXPECT_EQ(panel.headline(), "Givens clash");
     EXPECT_TRUE(panel.plate("Clue")->dimmed());
     EXPECT_TRUE(panel.plate("Solve")->dimmed());
-    EXPECT_EQ(panel.message(), "The givens clash: 5 is twice in row 1 (r1c1, r1c9).");
+    EXPECT_EQ(panel.message(), "The givens clash: 5 is twice in row 9 (a9, i9).");
     EXPECT_TRUE(Painted(panel).IsValid());
 }
 

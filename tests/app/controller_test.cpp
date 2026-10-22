@@ -165,7 +165,7 @@ TEST(Controller, ClashingGivensAreSaidAndStopTheSolver)
     controller.Enter(geometry::Cell(0, 0), 5);
     controller.Enter(geometry::Cell(0, 8), 5);
     EXPECT_EQ(controller.Headline(), "Givens clash");
-    EXPECT_EQ(controller.Message(), "The givens clash: 5 is twice in row 1 (r1c1, r1c9).");
+    EXPECT_EQ(controller.Message(), "The givens clash: 5 is twice in row 9 (a9, i9).");
     EXPECT_FALSE(controller.CanRun());
     EXPECT_EQ(controller.Picture().clashes, (std::vector<int>{geometry::Cell(0, 0), geometry::Cell(0, 8)}));
     controller.Undo();
@@ -183,7 +183,7 @@ TEST(Controller, AnImpossibleBoardIsNamed)
     }
     controller.Enter(geometry::Cell(1, 8), 9);
     EXPECT_EQ(controller.Headline(), "Impossible");
-    EXPECT_EQ(controller.Message(), "Impossible: r1c9 has no digit left.");
+    EXPECT_EQ(controller.Message(), "Impossible: i9 has no digit left.");
     EXPECT_FALSE(controller.CanRun());
 }
 
@@ -275,7 +275,7 @@ TEST(Controller, ThePictureCarriesTheValuesTheMarksAndTheStruckCandidates)
     const BoardPicture start = controller.Picture();
     EXPECT_TRUE(start.is_given[3]);
     EXPECT_EQ(start.values[3], 1);
-    EXPECT_FALSE(digits::Contains(start.candidates[0], 1)); // r1c4 is 1
+    EXPECT_FALSE(digits::Contains(start.candidates[0], 1)); // d9 is 1
     // Steps until one strikes candidates, then that step lit.
     for (int clue = 0; clue < 20 && controller.Picture().struck.empty(); ++clue)
     {

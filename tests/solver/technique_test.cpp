@@ -154,7 +154,7 @@ std::vector<Candidate> Sorted(std::vector<Candidate> eliminations)
 TEST(Techniques, ANakedQuadNeedNotHaveEveryDigitInEverySquare)
 {
     Grid grid;
-    // Row 1's first four squares: {1,2}, {2,3}, {3,4}, {1,4} - no pair or triple among them, a quad together.
+    // Row 9's first four squares, a9 to d9: {1,2}, {2,3}, {3,4}, {1,4} - no pair or triple among them, a quad together.
     Restrict(grid, 0, {1, 2});
     Restrict(grid, 1, {2, 3});
     Restrict(grid, 2, {3, 4});
@@ -192,7 +192,7 @@ TEST(Techniques, ANakedTripleIsFoundWithNoSquareHoldingAllThree)
 TEST(Techniques, AJellyfishStrikesTheDigitFromItsColumnsOutsideItsRows)
 {
     Grid grid;
-    // 1 only in columns 1 to 4 on rows 1 to 4.
+    // 1 only in columns a to d on rows 9 to 6.
     for (int row = 0; row < 4; row++)
     {
         for (int column = 4; column < 9; column++)
@@ -219,7 +219,7 @@ TEST(Techniques, AJellyfishStrikesTheDigitFromItsColumnsOutsideItsRows)
 TEST(Techniques, AnXWingStrikesTheDigitFromItsColumnsOutsideItsRows)
 {
     Grid grid;
-    // 5 only in columns 2 and 7 on rows 3 and 8.
+    // 5 only in columns b and g on rows 7 and 2.
     for (int row : {2, 7})
     {
         for (int column = 0; column < 9; column++)
@@ -246,11 +246,11 @@ TEST(Techniques, RemovesNamesEachDigitsSquaresInOrder)
 {
     EXPECT_EQ(Removes({}), "removes nothing");
     std::vector<Candidate> one{{geometry::Cell(3, 8), 3}, {geometry::Cell(3, 0), 3}};
-    EXPECT_EQ(Removes(one), "removes 3 from r4c1, r4c9");
+    EXPECT_EQ(Removes(one), "removes 3 from a6, i6");
     std::vector<Candidate> three{{40, 7}, {geometry::Cell(3, 8), 3}, {0, 1}, {geometry::Cell(3, 0), 3}};
-    EXPECT_EQ(Removes(three), "removes 1 from r1c1, 3 from r4c1, r4c9 and 7 from r5c5");
+    EXPECT_EQ(Removes(three), "removes 1 from a9, 3 from a6, i6 and 7 from e5");
     EXPECT_EQ(TechniqueName(Technique::kXYZWing), "XYZ-wing");
-    EXPECT_EQ((Candidate{40, 5}.Text()), "r5c5=5");
+    EXPECT_EQ((Candidate{40, 5}.Text()), "e5=5");
 }
 
 TEST(Techniques, EveryTechniqueHasANameOfItsOwn)
