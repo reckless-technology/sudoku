@@ -476,22 +476,45 @@ TEST_F(Views, ShowsTheAboutCardAndClosesIt)
     MainView                          view(resources);
     view.SetHost(&host_);
     view.SetBounds({MainView::kDesignWidth, MainView::kDesignHeight});
-    AboutView about(kVersion, "The licence.", "The notices.");
-    int       closes = 0;
-    about.on_close   = [&] { ++closes; };
+    AboutView                about(kVersion);
+    int                      closes = 0;
+    std::vector<std::string> opened;
+    about.on_close = [&] { ++closes; };
     view.SetOverlay(&about);
     EXPECT_EQ(view.overlay(), &about);
     EXPECT_EQ(about.bounds(), view.LocalBounds());
-    EXPECT_EQ(about.text(), "The licence.\n\nThe notices.");
+    EXPECT_EQ(about.Lines(), (std::vector<std::string>{
+                                 "Reckless Sudoku", std::string("Version ") + kVersion,
+                                 "Copyright 2008-2026 Jonny Reckless. Reckless Technology.", "recklesstechnology.com",
+                                 "Free, proprietary software, used under its end-user licence (EULA.txt).",
+                                 "Third-party notices are in THIRD-PARTY-NOTICES.txt, installed beside the "
+                                 "app."}));
     EXPECT_TRUE(Painted(view).IsValid());
+
+    // The website's link, lit under the pointer and opened when clicked; nothing opened with no one to open it.
+    LinkLabel &link = about.link();
+    EXPECT_TRUE(about.CardArea().Contains(link.bounds()));
+    EXPECT_GT(link.width(), 0);
+    const reckless::view::MouseEvent middle =
+        At(static_cast<float>(link.width()) / 2.0f, static_cast<float>(link.height()) / 2.0f);
+    link.MouseUp(middle);
+    EXPECT_TRUE(opened.empty());
+    about.open_url = [&](const std::string &url) { opened.push_back(url); };
+    link.MouseEnter(middle);
+    EXPECT_TRUE(link.is_over());
+    EXPECT_TRUE(Painted(view).IsValid());
+    link.MouseUp(middle);
+    link.MouseUp(At(-5.0f, -5.0f)); // released outside: nothing
+    link.MouseExit(middle);
+    EXPECT_FALSE(link.is_over());
+    EXPECT_EQ(opened, std::vector<std::string>{AboutView::kWebsite});
+    EXPECT_FALSE(about.KeyPressed(KeyOf(reckless::view::Key::kCharacter, U'x')));
+
     EXPECT_TRUE(about.KeyPressed(KeyOf(reckless::view::Key::kEscape)));
     about.MouseDown(At(2.0f, 2.0f)); // outside the card
     EXPECT_EQ(closes, 2);
     view.SetOverlay(nullptr);
     EXPECT_EQ(view.overlay(), nullptr);
-
-    AboutView embedded(kVersion);
-    EXPECT_FALSE(embedded.text().empty()) << "the licence and the notices the binary carries";
 }
 
 } // namespace

@@ -2,13 +2,10 @@
 # macOS .app, a Linux binary - the render tool, and the library both are made from, which the window's suite links.
 
 # The files the binary carries (the toolkit's reckless_module_assets): the series' serif and the company mark, the
-# monospaced family the pencil marks are set in, the app's icon at 256 pixels for the window's title bar on Linux and
-# the About card, and the program's licence and its third-party notices (tools/third_party_notices.py), so the program
-# can show them.
+# monospaced family the pencil marks are set in, and the app's icon at 256 pixels for the window's title bar on Linux
+# and the About card.
 reckless_monospace_font_files(sudoku_monospace)
-reckless_module_assets(sudoku_assets ${sudoku_monospace}
-    "icon_256.png=${PROJECT_SOURCE_DIR}/assets/icon/icon_256.png"
-    "licence.txt=${PROJECT_SOURCE_DIR}/LICENSE" "third_party_notices.txt=${PROJECT_SOURCE_DIR}/THIRD-PARTY-NOTICES.txt")
+reckless_module_assets(sudoku_assets ${sudoku_monospace} "icon_256.png=${PROJECT_SOURCE_DIR}/assets/icon/icon_256.png")
 
 add_library(sudoku_gui STATIC
     about_view.cpp

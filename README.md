@@ -192,7 +192,7 @@ toolkit's `tools/sign-mac.sh`, when `MACOS_DEVELOPER_ID_APPLICATION_P12` is set)
 Reckless Sudoku is proprietary (`LICENSE`); the program is licensed to the people who use it under `EULA.txt`, which
 every installer shows and carries. The third-party parts the executable contains (Skia with libpng, zlib and, on Linux,
 FreeType; the Noto Serif and Monaspace Xenon typefaces) are listed with their licences in `THIRD-PARTY-NOTICES.txt`,
-which every package installs and the executable carries.
+which every package installs. Help > About says both in a line each, as every Reckless app's About does.
 
 ## History
 

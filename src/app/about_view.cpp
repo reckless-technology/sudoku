@@ -5,6 +5,8 @@
 #include "Embedded.h"
 #include "SkiaCanvas.h"
 
+#include <algorithm>
+#include <cmath>
 #include <utility>
 
 namespace sudoku::app
@@ -13,66 +15,94 @@ namespace sudoku::app
 namespace
 {
 
+using reckless::gfx::Justify;
 using reckless::gfx::RectF;
 using reckless::gfx::RectI;
 
-/**
- * @param name A file the binary carries.
- * @return Its text; empty where the binary carries none.
- */
-std::string EmbeddedText(const char *name)
-{
-    const auto bytes = reckless::embedded::Find(name);
-    return std::string(reinterpret_cast<const char *>(bytes.data()), bytes.size());
-}
+constexpr int kPadding      = 28;  ///< Inside the card.
+constexpr int kMarkSide     = 112; ///< The icon's square.
+constexpr int kTextLeft     = 136; ///< The text beside the icon, from the content's left.
+constexpr int kLine         = 24;  ///< A line of body text.
+constexpr int kNameHeight   = 38;  ///< The app's name.
+constexpr int kCopyrightTop = 68;  ///< The copyright's line, from the icon's top: under the name and the version.
+constexpr int kTermsGap     = 22;  ///< Between the icon and the terms under it.
+constexpr int kSectionGap   = 16;  ///< Above the notices' line.
 
-/** @return The scrolling text's look: the window's colours, the interface's face a size small. */
-reckless::view::TextView::Style TextStyle()
+constexpr const char *kName      = "Reckless Sudoku";
+constexpr const char *kCopyright = "Copyright 2008-2026 Jonny Reckless. Reckless Technology.";
+constexpr const char *kTerms     = "Free, proprietary software, used under its end-user licence (EULA.txt).";
+constexpr const char *kNotices   = "Third-party notices are in THIRD-PARTY-NOTICES.txt, installed beside the app.";
+
+/** @return The link's font: the body face at the body text's size. */
+reckless::gfx::Font LinkFont()
 {
-    reckless::view::TextView::Style style;
-    style.font       = fonts::Small().WithHeight(14.5f);
-    style.text       = theme::kInk;
-    style.background = theme::kWindow.Darker(0.3f);
-    style.outline    = theme::kRule;
-    style.highlight  = theme::kSelect;
-    style.padding    = 10;
-    return style;
+    return fonts::Small().WithHeight(17.0f);
 }
 
 } // namespace
 
-AboutView::AboutView(std::string version, std::string licence, std::string notices) : version_(std::move(version))
+LinkLabel::LinkLabel(std::string text) : text_(std::move(text))
+{
+    cursor = reckless::view::Cursor::kPointingHand;
+    SetOpaque(false);
+}
+
+void LinkLabel::Paint(reckless::gfx::Canvas &c)
+{
+    c.SetFont(LinkFont());
+    c.SetColor(theme::kAmber);
+    c.DrawText(text_, LocalBounds().ToFloat(), Justify::kCentredLeft, true);
+    if (is_over_)
+    {
+        const float underline = std::min(c.TextWidth(LinkFont(), text_), static_cast<float>(width()));
+        const float y         = static_cast<float>(height()) - 4.0f;
+        c.DrawLine({0.0f, y}, {underline, y}, 1.0f);
+    }
+}
+
+void LinkLabel::MouseEnter(const reckless::view::MouseEvent &e)
+{
+    static_cast<void>(e);
+    is_over_ = true;
+    Repaint();
+}
+
+void LinkLabel::MouseExit(const reckless::view::MouseEvent &e)
+{
+    static_cast<void>(e);
+    is_over_ = false;
+    Repaint();
+}
+
+void LinkLabel::MouseUp(const reckless::view::MouseEvent &e)
+{
+    if (LocalBounds().ToFloat().Contains(e.position) && on_click)
+    {
+        on_click();
+    }
+}
+
+AboutView::AboutView(std::string version) : version_(std::move(version)), link_("recklesstechnology.com")
 {
     SetOpaque(false);
     if (const auto bytes = reckless::embedded::Find("icon_256.png"); !bytes.empty())
     {
         icon_ = reckless::gfx::DecodeImage(bytes);
     }
-    if (licence.empty())
-    {
-        licence = EmbeddedText("licence.txt");
-    }
-    if (notices.empty())
-    {
-        notices = EmbeddedText("third_party_notices.txt");
-    }
-    text_            = std::make_unique<reckless::view::TextView>(TextStyle());
-    std::string text = licence + (notices.empty() || licence.empty() ? std::string() : "\n\n") + notices;
-    if (text.empty())
-    {
-        // A build that carries neither file: where the reader finds them.
-        text = "The licence and the third-party notices are in LICENSE and THIRD-PARTY-NOTICES.txt, installed beside "
-               "the program.";
-    }
-    text_->SetText(text);
-    AddChild(*text_);
+    link_.on_click = [this] {
+        if (open_url)
+        {
+            open_url(kWebsite);
+        }
+    };
+    AddChild(link_);
     close_ = std::make_unique<reckless::view::Button>("Close", theme::PlatePainter(), [this] { Close(); });
     AddChild(*close_);
 }
 
-const std::string &AboutView::text() const noexcept
+std::vector<std::string> AboutView::Lines() const
 {
-    return text_->text();
+    return {kName, "Version " + version_, kCopyright, link_.text(), kTerms, kNotices};
 }
 
 RectI AboutView::CardArea() const noexcept
@@ -90,27 +120,52 @@ void AboutView::Paint(reckless::gfx::Canvas &c)
     c.FillRoundedRect(card, 12.0f);
     c.SetColor(theme::kRule);
     c.DrawRoundedRect(card.Reduced(0.5f), 12.0f, 1.0f);
-    // The app's icon.
+
+    const float left      = card.x() + kPadding;
+    const float right     = card.right() - kPadding;
+    const float text_left = left + kTextLeft;
+    float       y         = card.y() + kPadding;
     if (icon_.IsValid())
     {
-        c.DrawImage(icon_, RectF{card.x() + 24.0f, card.y() + 22.0f, 60.0f, 60.0f});
+        c.SetResampling(reckless::gfx::Resampling::kHigh);
+        c.DrawImage(icon_, RectF{left, y, static_cast<float>(kMarkSide), static_cast<float>(kMarkSide)});
     }
-    c.SetFont(fonts::Headline());
+    c.SetFont(fonts::Body().WithHeight(28.0f).Bold());
     c.SetColor(theme::kInk);
-    c.DrawText("Reckless Sudoku", RectF{card.x() + 104.0f, card.y() + 20.0f, card.width() - 140.0f, 36.0f},
-               reckless::gfx::Justify::kCentredLeft, true);
+    c.DrawText(kName, RectF{text_left, y, right - text_left, static_cast<float>(kNameHeight)}, Justify::kCentredLeft,
+               true);
     c.SetFont(fonts::Small());
     c.SetColor(theme::kMuted);
-    c.DrawText("Version " + version_ + "  ·  © 2008–2026 Jonny Reckless",
-               RectF{card.x() + 104.0f, card.y() + 56.0f, card.width() - 140.0f, 22.0f},
-               reckless::gfx::Justify::kCentredLeft, true);
+    c.DrawText("Version " + version_, RectF{text_left, y + kNameHeight, right - text_left, 22.0f},
+               Justify::kCentredLeft, true);
+    c.SetFont(fonts::Small().WithHeight(17.0f));
+    c.SetColor(theme::kInk);
+    c.DrawText(kCopyright, RectF{text_left, y + kCopyrightTop, right - text_left, static_cast<float>(kLine)},
+               Justify::kCentredLeft, true);
+    // The link, a line under the copyright, is a view of its own.
+
+    y += kMarkSide + kTermsGap;
+    c.SetColor(theme::kInk);
+    c.DrawText(kTerms, RectF{left, y, right - left, static_cast<float>(kLine)}, Justify::kCentredLeft, true);
+    y += kLine + kSectionGap;
+    c.SetColor(theme::kRule);
+    c.DrawHorizontalLine(static_cast<int>(y) - 6, left, right);
+    c.SetFont(fonts::Small());
+    c.SetColor(theme::kMuted);
+    // On one line, squeezed a little where a face draws it wider than the card.
+    c.DrawFittedText(kNotices,
+                     RectI{static_cast<int>(left), static_cast<int>(y), static_cast<int>(right - left), kLine},
+                     Justify::kCentredLeft, 1, 0.85f);
 }
 
 void AboutView::Resized()
 {
-    const RectI card = CardArea();
-    text_->SetBounds({card.x() + 20, card.y() + 96, card.width() - 40, card.height() - 96 - 70});
-    close_->SetBounds({card.right() - 140, card.bottom() - 56, 120, 38});
+    const RectI card      = CardArea();
+    const int   text_left = card.x() + kPadding + kTextLeft;
+    const int   link_y    = card.y() + kPadding + kCopyrightTop + kLine; // the line under the copyright
+    const int   width     = static_cast<int>(std::ceil(reckless::gfx::MeasureText(LinkFont(), link_.text()))) + 4;
+    link_.SetBounds({text_left, link_y, std::min(width, card.right() - kPadding - text_left), kLine});
+    close_->SetBounds({card.right() - kPadding - 120, card.bottom() - 22 - 38, 120, 38});
 }
 
 void AboutView::MouseDown(const reckless::view::MouseEvent &e)
