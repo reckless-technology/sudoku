@@ -1,6 +1,8 @@
 #pragma once
 /// @file geometry.h The board's shape: 81 squares numbered row by row from the top left (square column + 9 * row), its
-/// 27 units - the rows, the columns and the boxes - and the 20 squares each square shares a unit with.
+/// 27 units - the rows, the columns and the boxes - and the 20 squares each square shares a unit with. A square is
+/// named as a chess board names one: its column's letter, a to i from the left, and its row's number, 1 to 9 from the
+/// bottom - the top left square is a9.
 
 #include <array>
 #include <span>
@@ -24,7 +26,7 @@ struct Unit
     int                index{0};             ///< Which one, from 0.
     std::array<int, 9> cells{};              ///< Its nine squares, in reading order.
 
-    /** @return Its name: "row 4", "column 7", "box 5". */
+    /** @return Its name: "row 4" (rows counted from the bottom), "column e", "box 5" (boxes in reading order). */
     std::string Name() const;
 
     /**
@@ -87,14 +89,32 @@ constexpr bool Sees(int a, int b) noexcept
 }
 
 /**
+ * @param column A column, from 0 at the left.
+ * @return Its letter on the board: 'a' to 'i'.
+ */
+constexpr char ColumnLetter(int column) noexcept
+{
+    return static_cast<char>('a' + column);
+}
+
+/**
+ * @param row A row, from 0 at the top.
+ * @return Its number on the board: 9 at the top down to 1 at the bottom.
+ */
+constexpr int RowNumber(int row) noexcept
+{
+    return 9 - row;
+}
+
+/**
  * @param cell A square.
- * @return Its name, row and column from 1: "r4c7".
+ * @return Its name, as a chess board names a square: its column's letter and its row's number - "e7".
  */
 std::string Name(int cell);
 
 /**
  * @param cells Squares.
- * @return Their names, joined: "r4c2, r4c6".
+ * @return Their names, joined: "b6, f6".
  */
 std::string Names(std::span<const int> cells);
 

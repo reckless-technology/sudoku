@@ -6,13 +6,16 @@ each step what it saw. C++20, its window drawn with Skia on reckless-toolkit, fo
 
 ## Using it
 
+- **The board** is labelled as a chess board is: the columns a to i from the left, the rows 1 to 9 from the bottom, so
+  the top left square is a9. Every step names squares that way, and rows and columns by their labels ("row 6",
+  "column e"); the boxes are numbered 1 to 9 in reading order from the top left.
 - **Entering a puzzle.** Click a square, or move to it with the arrow keys, and type 1 to 9; 0, Delete, Backspace or
   Space clears it. Right-click a square for the same choices as a menu. The digits entered are the givens, drawn in
   bold cream. Two givens that clash are washed red and named beside the board, and the solver waits until they are put
   right; givens that leave a square no digit, or a digit no place, are named the same way.
 - **Clue** (F5) takes steps until one places a value; **Solve** (F6) goes on until the board is full or nothing more can
   be deduced. The solver's values are drawn in amber. Every step is listed beside the board in words - "Hidden pair
-  {3,7} in row 4 (r4c2, r4c6) removes 1 from r4c2" - and choosing one lights it: the squares it reasoned from washed in
+  {3,7} in row 6 (b6, f6) removes 1 from b6" - and choosing one lights it: the squares it reasoned from washed in
   amber, the value it placed in green, the candidates it struck in red.
 - **Check** (F7) searches for the puzzle's solutions and says whether it has none, one or more than one. When Solve stops
   short it says why the same way: no solution, more than one, or one that needs a deeper chain than the solver follows.

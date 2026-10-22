@@ -64,8 +64,16 @@ const Shape &TheShape()
 
 std::string Unit::Name() const
 {
-    const char *kind_name = kind == UnitKind::kRow ? "row" : kind == UnitKind::kColumn ? "column" : "box";
-    return std::string(kind_name) + " " + std::to_string(index + 1);
+    switch (kind)
+    {
+    case UnitKind::kRow:
+        return "row " + std::to_string(geometry::RowNumber(index));
+    case UnitKind::kColumn:
+        return std::string("column ") + geometry::ColumnLetter(index);
+    case UnitKind::kBox:
+        break;
+    }
+    return "box " + std::to_string(index + 1);
 }
 
 bool Unit::Contains(int cell) const noexcept
@@ -78,7 +86,7 @@ namespace geometry
 
 std::string Name(int cell)
 {
-    return "r" + std::to_string(Row(cell) + 1) + "c" + std::to_string(Column(cell) + 1);
+    return ColumnLetter(Column(cell)) + std::to_string(RowNumber(Row(cell)));
 }
 
 std::string Names(std::span<const int> cells)

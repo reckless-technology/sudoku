@@ -18,8 +18,9 @@ namespace
 using reckless::gfx::PointF;
 using reckless::gfx::RectF;
 
-constexpr float kMargin = 24.0f; ///< Round the board, in design pixels.
-constexpr int   kClear  = 10;    ///< The digit menu's Clear: its id.
+constexpr float kMargin =
+    36.0f;                 ///< Round the board, in design pixels: room for the columns' letters and the rows' numbers.
+constexpr int kClear = 10; ///< The digit menu's Clear: its id.
 
 /**
  * @param board The board's square.
@@ -172,6 +173,21 @@ void BoardView::PaintBoard(reckless::gfx::Canvas &c, RectF board, const BoardPic
         c.DrawLine({board.x(), board.y() + offset}, {board.right(), board.y() + offset}, 2.5f);
     }
     c.DrawRoundedRect(board, 3.0f, 2.5f);
+
+    // The squares' names, as a chess board's: the columns' letters under the board, the rows' numbers at its left.
+    const float band = std::min(kMargin - 6.0f, side * 0.5f);
+    c.SetFont(fonts::Mono(std::min(17.0f, side * 0.28f)));
+    c.SetColor(theme::kMuted);
+    for (int line = 0; line < 9; ++line)
+    {
+        const float offset = static_cast<float>(line) * side;
+        c.DrawText(std::string(1, geometry::ColumnLetter(line)),
+                   RectF{board.x() + offset, board.bottom() + 6.0f, side, band}, reckless::gfx::Justify::kCentred,
+                   false);
+        c.DrawText(std::to_string(geometry::RowNumber(line)),
+                   RectF{board.x() - 6.0f - band, board.y() + offset, band, side}, reckless::gfx::Justify::kCentred,
+                   false);
+    }
     if (has_focus)
     {
         c.SetColor(theme::kAmber);

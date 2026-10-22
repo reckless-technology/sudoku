@@ -40,7 +40,7 @@ class MessageView final : public reckless::view::View
     std::string text_; ///< What it says.
 };
 
-/** The steps as the list shows them: "12. Hidden pair {3,7} in row 4 ...". */
+/** The steps as the list shows them: "12. Hidden pair {3,7} in row 6 (b6, f6) ...". */
 class StepsModel final : public reckless::view::ListModel
 {
   public:
