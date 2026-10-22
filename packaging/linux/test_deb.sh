@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # The Debian package held to the stage it was made from, with no root and nothing installed: its control fields, every
-# staged file byte for byte at its place with its mode, the menu entry (desktop-file-validate where it is installed) and
-# the icon, its md5sums, nothing outside its own files, and every library the binary needs owned by a package its
-# Depends names.
+# staged file byte for byte at its place with its mode (the puzzle bank in share/reckless-sudoku beside bin), the menu
+# entry (desktop-file-validate where it is installed) and the icon, its md5sums, nothing outside its own files, and
+# every library the binary needs owned by a package its Depends names.
 #
 #   packaging/linux/test_deb.sh <dist-dir> <version> <deb>
 set -euo pipefail
@@ -28,6 +28,11 @@ dpkg-deb --raw-extract "$deb" "$work/x"
 x="$work/x"
 cmp -s "$dist/reckless-sudoku" "$x/opt/reckless-technology/bin/reckless-sudoku" || fail "reckless-sudoku is not the staged one"
 [ "$(stat -c %a "$x/opt/reckless-technology/bin/reckless-sudoku")" = 755 ] || fail "reckless-sudoku is not 0755"
+bank=opt/reckless-technology/share/reckless-sudoku/puzzles
+for puzzles in easy.txt medium.txt hard.txt diabolical.txt; do
+    cmp -s "$dist/puzzles/$puzzles" "$x/$bank/$puzzles" || fail "the puzzle bank's $puzzles is not the staged one"
+    [ "$(stat -c %a "$x/$bank/$puzzles")" = 644 ] || fail "$puzzles is not 0644"
+done
 for doc in EULA.txt THIRD-PARTY-NOTICES.txt; do
     cmp -s "$dist/$doc" "$x/usr/share/doc/reckless-sudoku/$doc" || fail "$doc is not the staged one"
     [ "$(stat -c %a "$x/usr/share/doc/reckless-sudoku/$doc")" = 644 ] || fail "$doc is not 0644"
@@ -46,7 +51,8 @@ done
 outside=$(cd "$x" && find . \( -type f -o -type l \) ! -path './DEBIAN/*' | grep -v -x -e './opt/reckless-technology/bin/reckless-sudoku' \
     -e "./usr/share/applications/$id.desktop" -e "./usr/share/icons/hicolor/256x256/apps/$id.png" \
     -e './usr/share/doc/reckless-sudoku/EULA.txt' -e './usr/share/doc/reckless-sudoku/THIRD-PARTY-NOTICES.txt' \
-    -e './usr/share/doc/reckless-sudoku/copyright' || true)
+    -e './usr/share/doc/reckless-sudoku/copyright' -e "./$bank/easy.txt" -e "./$bank/medium.txt" \
+    -e "./$bank/hard.txt" -e "./$bank/diabolical.txt" || true)
 [ -z "$outside" ] || fail "files the package should not hold: $outside"
 
 # Every library the binary needs is owned by a package Depends names.

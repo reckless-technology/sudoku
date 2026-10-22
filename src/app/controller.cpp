@@ -4,12 +4,15 @@
 #include "solver/puzzle_file.h"
 
 #include <algorithm>
+#include <cstdio>
 #include <utility>
 
 namespace sudoku::app
 {
 
-Controller::Controller(Settings settings) : settings_(std::move(settings))
+Controller::Controller(Settings settings, std::filesystem::path puzzle_bank)
+    : settings_(std::move(settings)), puzzle_bank_(std::move(puzzle_bank)),
+      has_puzzle_bank_(!puzzle_bank_.empty() && puzzle_bank::IsBank(puzzle_bank_)), random_(std::random_device{}())
 {
 }
 
@@ -94,6 +97,32 @@ bool Controller::Open(const std::filesystem::path &path)
     }
     file_name_ = name;
     Said("Opened " + name + ".");
+    return true;
+}
+
+bool Controller::NewPuzzle(puzzle_bank::Band band)
+{
+    const std::string name(puzzle_bank::BandName(band));
+    const std::size_t count = has_puzzle_bank_ ? puzzle_bank::Count(puzzle_bank_, band) : 0;
+    if (count == 0)
+    {
+        message_ = "No new puzzle: the puzzle bank is not installed beside the app. Open a puzzle from a file instead.";
+        return false;
+    }
+    const std::size_t                        index  = std::uniform_int_distribution<std::size_t>(0, count - 1)(random_);
+    const std::optional<puzzle_bank::Puzzle> puzzle = puzzle_bank::Read(puzzle_bank_, band, index);
+    if (!puzzle)
+    {
+        message_ = "No new puzzle: the puzzle bank's " + puzzle_bank::FileName(band) + " is damaged at record " +
+                   std::to_string(index + 1) + ".";
+        return false;
+    }
+    game_.Load(puzzle->givens);
+    file_name_ = name + " " + puzzle->id;
+    char rating[16];
+    std::snprintf(rating, sizeof rating, "%.1f", puzzle->rating);
+    Said(name + " puzzle " + puzzle->id + ", rated " + rating + ", one of " + std::to_string(count) +
+         " in the Sudoku Exchange puzzle bank.");
     return true;
 }
 

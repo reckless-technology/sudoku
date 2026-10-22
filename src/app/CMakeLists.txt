@@ -13,6 +13,7 @@ add_library(sudoku_gui STATIC
     controller.cpp
     main_view.cpp
     menus.cpp
+    puzzle_bank_folder.cpp
     settings_file.cpp
     side_panel.cpp)
 target_include_directories(sudoku_gui PUBLIC "${PROJECT_SOURCE_DIR}/src" "${PROJECT_BINARY_DIR}/generated")
@@ -54,7 +55,25 @@ if(APPLE)
     target_sources(RecklessSudoku PRIVATE "${SUDOKU_ICONS}/icon.icns")
     set_source_files_properties("${SUDOKU_ICONS}/icon.icns" PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
     reckless_sign_bundle(RecklessSudoku "$<TARGET_BUNDLE_DIR:RecklessSudoku>")
-elseif(WIN32)
+endif()
+
+# The puzzle bank (cmake/sudoku_puzzle_bank.cmake), where the app looks for it (puzzle_bank_folder.h): in the bundle's
+# Resources on macOS, beside the executable elsewhere - as the installers lay it out.
+if(SUDOKU_PUZZLE_BANK)
+    include(sudoku_puzzle_bank)
+    if(APPLE)
+        target_sources(RecklessSudoku PRIVATE ${SUDOKU_PUZZLE_BANK_FILES})
+        set_source_files_properties(${SUDOKU_PUZZLE_BANK_FILES} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/puzzles)
+    else()
+        add_custom_command(TARGET RecklessSudoku POST_BUILD
+            COMMAND "${CMAKE_COMMAND}" -E make_directory "$<TARGET_FILE_DIR:RecklessSudoku>/puzzles"
+            COMMAND "${CMAKE_COMMAND}" -E copy_if_different ${SUDOKU_PUZZLE_BANK_FILES}
+                    "$<TARGET_FILE_DIR:RecklessSudoku>/puzzles/"
+            VERBATIM)
+    endif()
+endif()
+
+if(WIN32)
     # A window of its own, no console; main() as its entry, as the toolkit's platform expects.
     set_target_properties(RecklessSudoku PROPERTIES WIN32_EXECUTABLE TRUE)
     if(MSVC)

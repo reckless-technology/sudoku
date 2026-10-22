@@ -1,15 +1,16 @@
 #!/usr/bin/env bash
 # The macOS installer held to the stage it was made from, with nothing installed and no root: expanded whole, each part
-# at its version and identifier, its payload exactly the staged files byte for byte at their places, the app not
-# relocatable, the distribution's floor and end-user licence; the uninstaller whole, the program's, and its script run
-# on the payloads laid out as a stand-in for / - taking off the program and leaving another product's app beside it, and
-# a bundle at the program's place that is not the program; and with --signed, the product's signature a Developer ID
-# Installer's and the app's and the uninstaller's Developer ID Application's with the hardened runtime.
+# at its version and identifier, its payload exactly the staged files byte for byte at their places (the puzzle bank in
+# the app's Resources), the app not relocatable, the distribution's floor and end-user licence; the uninstaller whole,
+# the program's, and its script run on the payloads laid out as a stand-in for / - taking off the program and leaving
+# another product's app beside it, and a bundle at the program's place that is not the program; and with --signed, the
+# product's signature a Developer ID Installer's and the app's and the uninstaller's Developer ID Application's with the
+# hardened runtime.
 #
 #   packaging/macos/test_installer.sh <dist-dir> <version> <pkg> [--signed]
 set -euo pipefail
 
-[ $# -ge 3 ] || { sed -n '2,9p' "$0" >&2; exit 2; }
+[ $# -ge 3 ] || { sed -n '2,10p' "$0" >&2; exit 2; }
 dist=$(cd "$1" && pwd)
 version=$2
 pkg=$3
@@ -36,6 +37,9 @@ grep -q 'install-location="/Applications"' "$work/x/app.pkg/PackageInfo" || fail
 app="$work/x/app.pkg/Payload/Reckless Technology/RecklessSudoku.app"
 [ -d "$app" ] || fail "the app is not at /Applications/Reckless Technology"
 diff -r "$dist/RecklessSudoku.app" "$app" > /dev/null || fail "the app is not the staged app"
+for puzzles in easy.txt medium.txt hard.txt diabolical.txt; do
+    [ -s "$app/Contents/Resources/puzzles/$puzzles" ] || fail "the app carries no puzzle bank's $puzzles"
+done
 docs="$work/x/docs.pkg/Payload/Library/Documentation/Reckless Sudoku"
 for doc in EULA.txt THIRD-PARTY-NOTICES.txt; do
     cmp -s "$dist/$doc" "$docs/$doc" || fail "$doc is not the staged one"

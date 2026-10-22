@@ -8,6 +8,7 @@
 #include "app/main_view.h"
 #include "app/menus.h"
 #include "app/paths.h"
+#include "app/puzzle_bank_folder.h"
 #include "app/settings_file.h"
 #include "app/theme.h"
 #include "version.h"
@@ -52,7 +53,7 @@ int main(int argc, char **argv)
 
     // The person's choices as they left them (settings_file.h); a launch's check reads and keeps none.
     sudoku::app::SettingsKeeper keeper(options.is_smoke ? std::filesystem::path() : sudoku::app::DefaultSettingsFile());
-    sudoku::app::Controller     controller(keeper.Read());
+    sudoku::app::Controller controller(keeper.Read(), sudoku::app::PuzzleBankBeside(sudoku::app::ExecutableFolder()));
     if (puzzle)
     {
         controller.Open(*puzzle);
@@ -148,6 +149,7 @@ int main(int argc, char **argv)
     board.on_select               = [&](int cell) { controller.Select(cell); };
     board.on_digit                = [&](int cell, int digit) { controller.Enter(cell, digit); };
     sudoku::app::SidePanel &panel = view.panel();
+    panel.on_new_puzzle           = [&](sudoku::puzzle_bank::Band band) { controller.NewPuzzle(band); };
     panel.on_clue                 = [&] { sudoku::app::RunCommand(sudoku::app::kClue, controller, handlers, {}); };
     panel.on_solve                = [&] { sudoku::app::RunCommand(sudoku::app::kSolve, controller, handlers, {}); };
     panel.on_check                = [&] { controller.Check(); };

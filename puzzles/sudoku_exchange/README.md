@@ -17,6 +17,9 @@ order of a hash of their digits, so the first are a sample of the whole. Each re
 that hash, a space, the 81 squares row by row from the top left (0 for an empty square), a space, the rating
 right-aligned in four characters (` 1.2`, `10.4`) and a line feed. `.gitattributes` keeps them byte for byte.
 
+The app ships the whole bank, fetched by the build at the same commit (`cmake/sudoku_puzzle_bank.cmake`, each file held
+to its SHA-256), and offers new puzzles of each band from it.
+
 `tests/solver/rated_puzzle_test.cpp` solves every one by deduction and holds every step to its solution. Run over
 the whole bank, the solver finishes all 893,916 puzzles with no step their solutions contradict - the easy ones by
 singles alone, the medium ones by nothing past pointing; the hardest take up to about a second.

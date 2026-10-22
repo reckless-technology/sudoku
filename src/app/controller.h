@@ -1,13 +1,16 @@
 #pragma once
 /// @file controller.h The window's state, written against no toolkit: the game, the square chosen, the step lit, the
-/// pencil marks, the puzzle's file, and what the window says - where the puzzle stands and what was last done.
+/// pencil marks, the puzzle's file or its place in the puzzle bank, and what the window says - where the puzzle stands
+/// and what was last done.
 
 #include "app/board_picture.h"
 #include "solver/game.h"
+#include "solver/puzzle_bank.h"
 
 #include <cstddef>
 #include <filesystem>
 #include <optional>
+#include <random>
 #include <string>
 
 namespace sudoku::app
@@ -33,8 +36,11 @@ struct Settings
 class Controller
 {
   public:
-    /** @param settings The choices kept from the last launch. */
-    explicit Controller(Settings settings = {});
+    /**
+     * @param settings The choices kept from the last launch.
+     * @param puzzle_bank The puzzle bank's folder (puzzle_bank.h), which new puzzles come from; empty for none.
+     */
+    explicit Controller(Settings settings = {}, std::filesystem::path puzzle_bank = {});
 
     /** @return The game. */
     const Game &game() const noexcept
@@ -60,7 +66,16 @@ class Controller
         return shown_step_;
     }
 
-    /** @return The puzzle's file name, as the title shows it; empty for a puzzle from no file. */
+    /** @return Whether new puzzles can be had: the puzzle bank is there and whole. */
+    bool HasPuzzleBank() const noexcept
+    {
+        return has_puzzle_bank_;
+    }
+
+    /**
+     * @return The puzzle's file name, or its band and id for one from the bank ("Hard 3f2a9c01b7e4"), as the title
+     * shows it; empty for a puzzle from neither.
+     */
     const std::string &file_name() const noexcept
     {
         return file_name_;
@@ -106,6 +121,13 @@ class Controller
      * @return Whether it was opened.
      */
     bool Open(const std::filesystem::path &path);
+    /**
+     * A puzzle of a band, chosen at random from the puzzle bank, set as the givens; without the bank, the board left as
+     * it was and why said.
+     * @param band The band.
+     * @return Whether a puzzle was set.
+     */
+    bool NewPuzzle(puzzle_bank::Band band);
 
     /**
      * The givens saved to a file (puzzle_file.h): bytes for a .sud file, text for any other.
@@ -148,12 +170,15 @@ class Controller
     /** After an act: the last step lit, and the message set. @param message What to say; none for where it stands. */
     void Said(std::optional<std::string> message);
 
-    Game                       game_;         ///< The game.
-    Settings                   settings_;     ///< The choices kept between launches.
-    int                        selected_{40}; ///< The square chosen.
-    std::optional<std::size_t> shown_step_;   ///< The step lit; none for none.
-    std::optional<std::string> message_;      ///< What was last done; none for where the puzzle stands.
-    std::string                file_name_;    ///< The puzzle's file name; empty for none.
+    Game                       game_;                   ///< The game.
+    Settings                   settings_;               ///< The choices kept between launches.
+    int                        selected_{40};           ///< The square chosen.
+    std::optional<std::size_t> shown_step_;             ///< The step lit; none for none.
+    std::optional<std::string> message_;                ///< What was last done; none for where the puzzle stands.
+    std::string                file_name_;              ///< The puzzle's file name; empty for none.
+    std::filesystem::path      puzzle_bank_;            ///< The puzzle bank's folder; empty for none.
+    bool                       has_puzzle_bank_{false}; ///< Whether the bank is there and whole.
+    std::mt19937_64            random_;                 ///< Picks the bank's puzzles.
 };
 
 } // namespace sudoku::app

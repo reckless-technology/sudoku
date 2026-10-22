@@ -22,6 +22,7 @@
 #include <gtest/gtest.h>
 
 #include <cstddef>
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -417,6 +418,36 @@ TEST_F(Views, ThePanelTellsEveryPlateAndDimsWhatCannotBeDone)
     EXPECT_TRUE(panel.plate("Solve")->dimmed());
     EXPECT_EQ(panel.message(), "The givens clash: 5 is twice in row 9 (a9, i9).");
     EXPECT_TRUE(Painted(panel).IsValid());
+}
+
+TEST_F(Views, ThePanelOffersANewPuzzleOfEachBandWhenThereIsABank)
+{
+    SidePanel panel;
+    panel.SetHost(&host_);
+    panel.SetBounds({0, 0, SidePanel::kWidth, 700});
+    std::vector<puzzle_bank::Band> told;
+    panel.on_new_puzzle = [&](puzzle_bank::Band band) { told.push_back(band); };
+    for (const bool has_bank : {false, true})
+    {
+        const Controller controller({}, has_bank ? std::filesystem::path(SUDOKU_PUZZLES_DIR) / "sudoku_exchange"
+                                                 : std::filesystem::path());
+        panel.Show(controller);
+        for (const puzzle_bank::Band band : puzzle_bank::kBands)
+        {
+            reckless::view::Button *plate = panel.plate(puzzle_bank::BandName(band));
+            ASSERT_NE(plate, nullptr) << puzzle_bank::BandName(band);
+            EXPECT_EQ(plate->dimmed(), !has_bank);
+            EXPECT_GT(plate->width(), 0);
+        }
+    }
+    for (const puzzle_bank::Band band : puzzle_bank::kBands)
+    {
+        Press(*panel.plate(puzzle_bank::BandName(band)));
+    }
+    EXPECT_EQ(told, std::vector<puzzle_bank::Band>(puzzle_bank::kBands.begin(), puzzle_bank::kBands.end()));
+    panel.on_new_puzzle = nullptr;
+    Press(*panel.plate("Easy")); // no one listening: nothing
+    EXPECT_EQ(told.size(), puzzle_bank::kBands.size());
 }
 
 TEST_F(Views, TheStepsListFollowsTheStepsAndLightsTheOneChosen)

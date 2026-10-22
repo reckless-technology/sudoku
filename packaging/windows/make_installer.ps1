@@ -32,7 +32,8 @@ $repo = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
 $dist = (Resolve-Path $DistDir).Path
 New-Item -ItemType Directory -Force -Path $OutDir | Out-Null
 $out = (Resolve-Path $OutDir).Path
-foreach ($file in 'RecklessSudoku.exe', 'EULA.txt', 'THIRD-PARTY-NOTICES.txt') {
+foreach ($file in 'RecklessSudoku.exe', 'puzzles\easy.txt', 'puzzles\medium.txt', 'puzzles\hard.txt',
+                  'puzzles\diabolical.txt', 'EULA.txt', 'THIRD-PARTY-NOTICES.txt') {
     if (-not (Test-Path (Join-Path $dist $file))) { throw "$dist has no ${file}: stage it with packaging/stage.py" }
 }
 

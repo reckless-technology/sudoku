@@ -7,6 +7,7 @@
 #include "app/board_view.h"
 #include "app/controller.h"
 #include "app/main_view.h"
+#include "app/puzzle_bank_folder.h"
 #include "app/theme.h"
 #include "solver/puzzle_file.h"
 
@@ -164,7 +165,8 @@ int main(int argc, char **argv)
     }
     const float scale = argc > 3 ? static_cast<float>(std::atof(argv[3])) : 1.0f;
 
-    sudoku::app::Controller controller;
+    // The bank where the build puts it beside the tool, as the app finds its own: the New puzzle plates live.
+    sudoku::app::Controller controller({}, sudoku::app::PuzzleBankBeside(sudoku::app::ExecutableFolder()));
     controller.Select(sudoku::geometry::Cell(4, 4));
     if (state == "puzzle" || state == "clue" || state == "x-wing" || state == "solved" || state == "no-marks")
     {

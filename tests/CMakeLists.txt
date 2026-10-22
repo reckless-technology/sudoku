@@ -2,6 +2,7 @@
 # the game, the files.
 add_executable(sudoku_solver_test
     solver/game_test.cpp
+    solver/puzzle_bank_test.cpp
     solver/puzzle_file_test.cpp
     solver/puzzle_test.cpp
     solver/rated_puzzle_test.cpp
