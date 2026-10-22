@@ -117,7 +117,8 @@ void BoardView::PaintBoard(reckless::gfx::Canvas &c, RectF board, const BoardPic
     c.SetColor(theme::kAmber.WithAlpha(has_focus ? 0.22f : 0.10f));
     c.FillRect(chosen);
 
-    // The values, and the empty squares' pencil marks.
+    // The values, those the lit step read ringed; and the empty squares' pencil marks, those the lit step read on an
+    // amber disc, those it struck red.
     const reckless::gfx::Font given  = reckless::gfx::Font(side * 0.58f).Bold();
     const reckless::gfx::Font solved = reckless::gfx::Font(side * 0.58f);
     const reckless::gfx::Font marks  = fonts::Mono(side * 0.24f);
@@ -128,27 +129,34 @@ void BoardView::PaintBoard(reckless::gfx::Canvas &c, RectF board, const BoardPic
         const RectF area  = CellArea(board, cell);
         if (const int value = picture.values[index]; value != 0)
         {
+            if (picture.IsReasonValue(cell))
+            {
+                c.SetColor(theme::kAmber);
+                c.DrawEllipse(area.Reduced(side * 0.12f), std::max(1.5f, side * 0.04f));
+            }
             c.SetFont(picture.is_given[index] ? given : solved);
             c.SetColor(picture.is_given[index] ? theme::kInk : theme::kAmber);
             c.DrawText(std::to_string(value), area, reckless::gfx::Justify::kCentred, false);
             continue;
         }
-        if (!picture.shows_pencil_marks)
-        {
-            continue;
-        }
         c.SetFont(marks);
         for (int digit = 1; digit <= 9; ++digit)
         {
-            const bool is_struck =
-                std::find(picture.struck.begin(), picture.struck.end(), Candidate{cell, digit}) != picture.struck.end();
-            if (!digits::Contains(picture.candidates[index], digit) && !is_struck)
+            const MarkLook look = picture.LookOf(cell, digit);
+            if (look == MarkLook::kHidden)
             {
                 continue;
             }
-            c.SetColor(is_struck ? theme::kBad : theme::kMuted);
             const RectF mark{area.x() + static_cast<float>((digit - 1) % 3) * third,
                              area.y() + static_cast<float>((digit - 1) / 3) * third, third, third};
+            if (look == MarkLook::kReason)
+            {
+                c.SetColor(theme::kAmber.WithAlpha(0.30f));
+                c.FillEllipse(mark.Reduced(third * 0.06f));
+            }
+            c.SetColor(look == MarkLook::kStruck   ? theme::kBad
+                       : look == MarkLook::kReason ? theme::kAmber
+                                                   : theme::kMuted);
             c.DrawText(std::to_string(digit), mark, reckless::gfx::Justify::kCentred, false);
         }
     }

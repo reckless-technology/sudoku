@@ -1,5 +1,6 @@
 #include "solver/digits.h"
 #include "solver/techniques/combinations.h"
+#include "solver/techniques/marks.h"
 #include "solver/techniques/seeing.h"
 #include "solver/techniques/techniques.h"
 
@@ -90,7 +91,8 @@ std::optional<Step> XYWing(const Grid &grid)
                                 std::move(description),
                                 {},
                                 std::move(eliminations),
-                                {pivot, first, second}};
+                                {pivot, first, second},
+                                MarksIn(grid, std::array<int, 3>{pivot, first, second}, digits::kAll)};
                 }
             }
         }
@@ -134,11 +136,8 @@ std::optional<Step> XYZWing(const Grid &grid)
                                           " and " + geometry::Name(pair[1]) + " " + digits::Format(second_set) +
                                           ": one of the three is " + std::to_string(digit) +
                                           ", so what sees all three loses it - " + Removes(eliminations);
-                return Step{Technique::kXYZWing,
-                            std::move(description),
-                            {},
-                            std::move(eliminations),
-                            {pivot, pair[0], pair[1]}};
+                return Step{Technique::kXYZWing,     std::move(description),    {},
+                            std::move(eliminations), {pivot, pair[0], pair[1]}, MarksIn(grid, three, digits::kAll)};
             }
         }
     }

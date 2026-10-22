@@ -1,8 +1,9 @@
 #pragma once
 /// @file techniques.h The techniques. Each looks at a board and returns the first deduction it finds as a Step - what
-/// it saw, the values it places, the candidates it strikes, the squares it reasoned from - without changing the board;
-/// none when it finds nothing. Every step a technique returns places a value in an empty square or strikes a candidate
-/// the board still has.
+/// it saw, the values it places, the candidates it strikes, the squares it reasoned from and what it read there -
+/// without changing the board; none when it finds nothing. Every step a technique returns places a value in an empty
+/// square or strikes a candidate the board still has, and every reason it gives is a candidate or a value the board
+/// holds.
 
 #include "solver/grid.h"
 #include "solver/step.h"

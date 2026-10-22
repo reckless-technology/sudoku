@@ -1,4 +1,5 @@
 #include "solver/digits.h"
+#include "solver/techniques/marks.h"
 #include "solver/techniques/techniques.h"
 
 #include <algorithm>
@@ -60,7 +61,12 @@ std::optional<Step> Pointing(const Grid &grid)
                     std::string description = "Pointing: " + std::to_string(digit) + " in " + box.Name() +
                                               " lies only in " + line->Name() + " (" + geometry::Names(places) +
                                               "), so the rest of " + line->Name() + " " + Removes(eliminations);
-                    return Step{Technique::kPointing, std::move(description), {}, std::move(eliminations), places};
+                    return Step{Technique::kPointing,
+                                std::move(description),
+                                {},
+                                std::move(eliminations),
+                                places,
+                                MarksIn(grid, places, digits::Bit(digit))};
                 }
             }
         }
@@ -104,7 +110,12 @@ std::optional<Step> Claiming(const Grid &grid)
                 std::string description = "Claiming: " + std::to_string(digit) + " on " + line->Name() +
                                           " lies only in " + box.Name() + " (" + geometry::Names(places) +
                                           "), so the rest of " + box.Name() + " " + Removes(eliminations);
-                return Step{Technique::kClaiming, std::move(description), {}, std::move(eliminations), places};
+                return Step{Technique::kClaiming,
+                            std::move(description),
+                            {},
+                            std::move(eliminations),
+                            places,
+                            MarksIn(grid, places, digits::Bit(digit))};
             }
         }
     }

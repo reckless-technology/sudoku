@@ -1,5 +1,6 @@
 #include "solver/digits.h"
 #include "solver/techniques/combinations.h"
+#include "solver/techniques/marks.h"
 #include "solver/techniques/seeing.h"
 #include "solver/techniques/techniques.h"
 
@@ -130,8 +131,12 @@ std::optional<Step> SimpleColouring(const Grid &grid)
                 std::string description = "Simple colouring (wrap): " + std::to_string(digit) + "'s chain " + chain +
                                           " has two squares of one colour in a unit, so that colour is false - " +
                                           Removes(eliminations);
-                return Step{
-                    Technique::kSimpleColouring, std::move(description), {}, std::move(eliminations), component};
+                return Step{Technique::kSimpleColouring,
+                            std::move(description),
+                            {},
+                            std::move(eliminations),
+                            component,
+                            MarksIn(grid, component, digits::Bit(digit))};
             }
             std::vector<Candidate> trapped;
             for (int cell = 0; cell < geometry::kCellCount; cell++)
@@ -147,7 +152,12 @@ std::optional<Step> SimpleColouring(const Grid &grid)
                 std::string description = "Simple colouring (trap): " + std::to_string(digit) + "'s chain " + chain +
                                           " - one colour holds it, so what sees both colours loses it - " +
                                           Removes(trapped);
-                return Step{Technique::kSimpleColouring, std::move(description), {}, std::move(trapped), component};
+                return Step{Technique::kSimpleColouring,
+                            std::move(description),
+                            {},
+                            std::move(trapped),
+                            component,
+                            MarksIn(grid, component, digits::Bit(digit))};
             }
         }
     }
@@ -217,8 +227,12 @@ std::optional<Step> XYChain(const Grid &grid)
                     }
                     std::string description = "XY-chain " + links + ": one end is " + std::to_string(z) +
                                               ", so what sees both ends loses it - " + Removes(eliminations);
-                    return Step{
-                        Technique::kXYChain, std::move(description), {}, std::move(eliminations), std::move(chain)};
+                    return Step{Technique::kXYChain,
+                                std::move(description),
+                                {},
+                                std::move(eliminations),
+                                chain,
+                                MarksIn(grid, chain, digits::kAll)};
                 }
             }
         }

@@ -185,7 +185,8 @@ BoardPicture Controller::Picture() const
         {
             picture.placed.push_back(placement.cell);
         }
-        picture.struck = step.eliminations;
+        picture.struck  = step.eliminations;
+        picture.reasons = step.reasons;
     }
     return picture;
 }

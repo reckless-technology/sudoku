@@ -1,7 +1,9 @@
 #include "solver/digits.h"
+#include "solver/techniques/marks.h"
 #include "solver/techniques/techniques.h"
 
 #include <algorithm>
+#include <array>
 #include <vector>
 
 namespace sudoku::techniques
@@ -83,7 +85,8 @@ std::optional<Step> Nishio(const Grid &grid)
                 std::string description = "Nishio: were " + name + " " + std::to_string(digit) + ", " +
                                           std::to_string(digit) + "'s own singles leave " + *reason + ", so " + name +
                                           " is not " + std::to_string(digit);
-                return Step{Technique::kNishio, std::move(description), {}, {Candidate{cell, digit}}, {cell}};
+                return Step{Technique::kNishio,      std::move(description), {}, {Candidate{cell, digit}}, {cell},
+                            {Candidate{cell, digit}}};
             }
         }
     }
@@ -125,8 +128,12 @@ std::optional<Step> ForcingChain(const Grid &grid)
                 std::string description = "Forcing chain: whichever of " + choice_text + " " + name +
                                           " takes, the singles that follow give " + geometry::Name(other) + " = " +
                                           std::to_string(value);
-                return Step{
-                    Technique::kForcingChain, std::move(description), {Candidate{other, value}}, {}, {cell, other}};
+                return Step{Technique::kForcingChain,
+                            std::move(description),
+                            {Candidate{other, value}},
+                            {},
+                            {cell, other},
+                            MarksIn(grid, std::array<int, 1>{cell}, digits::kAll)};
             }
         }
         std::vector<Candidate> eliminations;
@@ -152,7 +159,12 @@ std::optional<Step> ForcingChain(const Grid &grid)
             std::string removes     = Removes(eliminations);
             std::string description = "Forcing chain: whichever of " + choice_text + " " + name +
                                       " takes, the singles that follow remove" + removes.substr(7);
-            return Step{Technique::kForcingChain, std::move(description), {}, std::move(eliminations), {cell}};
+            return Step{Technique::kForcingChain,
+                        std::move(description),
+                        {},
+                        std::move(eliminations),
+                        {cell},
+                        MarksIn(grid, std::array<int, 1>{cell}, digits::kAll)};
         }
     }
     return std::nullopt;
@@ -173,7 +185,8 @@ std::optional<Step> ContradictionChain(const Grid &grid)
                                           ", the singles that follow leave " + *reason + ", so " + name + " is not " +
                                           std::to_string(digit);
                 return Step{
-                    Technique::kContradictionChain, std::move(description), {}, {Candidate{cell, digit}}, {cell}};
+                    Technique::kContradictionChain, std::move(description), {}, {Candidate{cell, digit}}, {cell},
+                    {Candidate{cell, digit}}};
             }
         }
     }
