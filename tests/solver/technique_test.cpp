@@ -79,9 +79,21 @@ TEST_P(EachTechnique, WhatItFindsAnywhereIsTrue)
 {
     const NamedFinder &finder = GetParam();
     int                found  = 0;
+    // The repository's puzzles, and the first diabolical ones of the Sudoku Exchange sample, whose boards the chains
+    // and the forcing techniques meet far more often.
+    std::vector<std::pair<std::string, Values>> puzzles;
     for (const std::string &name : test::PuzzleNames())
     {
-        Values givens = puzzle_file::Read(test::PuzzlesFolder() / name);
+        puzzles.emplace_back(name, puzzle_file::Read(test::PuzzlesFolder() / name));
+    }
+    std::vector<test::RatedPuzzle> diabolical = test::RatedPuzzles("diabolical");
+    diabolical.resize(std::min<std::size_t>(diabolical.size(), 30));
+    for (const test::RatedPuzzle &puzzle : diabolical)
+    {
+        puzzles.emplace_back("diabolical " + puzzle.id, puzzle.Givens());
+    }
+    for (const auto &[name, givens] : puzzles)
+    {
         Values solution{};
         ASSERT_EQ(CountSolutions(givens, &solution), SolutionCount::kOne) << name;
         Grid   grid = Grid::FromValues(givens);

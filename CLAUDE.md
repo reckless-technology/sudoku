@@ -21,7 +21,11 @@ C# is in the history, with the solver's design and its puzzles carried over.
   `menus`, `AboutView`, `settings_file` (`reckless-technology/sudoku/settings.json`), `theme.h` (the Reckless dark
   look: cream ink, amber accent, Noto Serif, Monaspace Xenon for the pencil marks).
 - `tests/solver/` (`sudoku_solver_test`): every puzzle in `puzzles/` solved with every step held to the solution, every
-  technique called directly on every board on the way and held to it, built patterns for those no puzzle needs.
+  technique called directly on every board on the way and held to it, built patterns for those no puzzle needs; and the
+  Sudoku Exchange sample (`puzzles/sudoku_exchange`, public domain, its README says where from), 2,250 rated puzzles a
+  test each, the easy and medium bands held to the techniques their ratings allow. The whole bank (893,916 puzzles)
+  solves; a change to the solver's order or its techniques is checked against the sample, and against the bank by hand
+  when it could matter.
   `tests/app/` (`sudoku_app_test`): controller, menus, settings file, views painted and driven.
 - `assets/icon/`: the icon at every size, drawn by `sudoku_render <out.png> icon <size>` and packed by
   `tools/make_icon.py` (Pillow); change the drawing (`render_main.cpp`'s `RenderIcon`), run the script, commit what it
