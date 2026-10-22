@@ -9,8 +9,9 @@ add_executable(sudoku_solver_test
 target_link_libraries(sudoku_solver_test PRIVATE sudoku_solver sudoku_warnings GTest::gtest_main)
 target_compile_definitions(sudoku_solver_test PRIVATE SUDOKU_PUZZLES_DIR="${PROJECT_SOURCE_DIR}/puzzles")
 # The test list is read when the tests run, not when they are built: a build never waits on the binary starting. Each
-# parameterised test is named by its own name ("xwing1_sdk", "XYChain"), not by its parameter's printed value.
-gtest_discover_tests(sudoku_solver_test DISCOVERY_MODE PRE_TEST NO_PRETTY_VALUES)
+# parameterised test is named by its own name ("xwing1_sdk", "XYChain"), not by its parameter's printed value. Listing
+# 2,400 tests from a debug build on a busy runner can take longer than the 5 s CMake allows by default.
+gtest_discover_tests(sudoku_solver_test DISCOVERY_MODE PRE_TEST NO_PRETTY_VALUES DISCOVERY_TIMEOUT 120)
 
 if(SUDOKU_GUI)
     add_subdirectory(app)

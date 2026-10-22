@@ -299,7 +299,8 @@ jobs:
   # 8.3: a debug build instrumented, every suite and the render tool's runs on Linux, red under 95 % of the lines of
   # src/, each directory's own figure in the report. The window's launch is left to the jobs that build the program as
   # it ships; on a desk, tools/coverage-windows.ps1 measures the same with clang-cl. Kept tree build/ci-coverage; its
-  # counters cleared before every run.
+  # counters cleared before every run. gcovr takes a count past 2^32 for a corrupt one; the rated puzzles call the
+  # grid's accessors billions of times, so the threshold is 2^40.
   coverage:
     name: Coverage (Linux, gcc)
     runs-on: [self-hosted, Linux, X64]
@@ -338,6 +339,7 @@ jobs:
           mkdir -p build/ci-coverage/coverage &&
           "${{ steps.gcovr.outputs.gcovr }}" --root . --filter 'src/' --exclude 'src/app/main[.]cpp' build/ci-coverage
           --gcov-ignore-parse-errors=negative_hits.warn_once_per_file
+          --gcov-suspicious-hits-threshold 1099511627776
           --print-summary --txt build/ci-coverage/coverage.txt --html-details build/ci-coverage/coverage/index.html
           --json-summary build/ci-coverage/coverage-summary.json
           --fail-under-line 95
