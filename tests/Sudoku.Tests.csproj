@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- The solver's suites: every puzzle in puzzles/ solved and checked step by step, the game, the files, the
+       techniques. dotnet test sudoku.slnx -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <RootNamespace>Sudoku.Tests</RootNamespace>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\src\core\Sudoku.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\puzzles\*.*" LinkBase="puzzles" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+</Project>
