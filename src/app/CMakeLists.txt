@@ -69,7 +69,7 @@ if(SUDOKU_BUILD_TESTS)
     set_tests_properties(app_smoke PROPERTIES LABELS window RESOURCE_LOCK display TIMEOUT 120)
 
     # The render tool drawing every state it knows, and the icon, into the build tree: each must write its picture.
-    foreach(state empty puzzle clue solved stuck clash no-marks about)
+    foreach(state empty puzzle clue x-wing solved stuck clash no-marks about)
         add_test(NAME render_${state} COMMAND sudoku_render "${CMAKE_CURRENT_BINARY_DIR}/render_${state}.png" ${state})
     endforeach()
     add_test(NAME render_icon COMMAND sudoku_render "${CMAKE_CURRENT_BINARY_DIR}/render_icon.png" icon 64)

@@ -75,6 +75,10 @@ struct Step
     std::vector<Candidate> placements;                         ///< The values it placed.
     std::vector<Candidate> eliminations;                       ///< The candidates it struck.
     std::vector<int>       pattern; ///< The squares it reasoned from, for the board to light.
+    /// What it read there, for the board to ring: the pencil marks the deduction rests on (a pair's two digits in its
+    /// two squares, an X-wing's digit in its four corners, the candidate a chain supposes) and, for a single, the
+    /// placed values that rule the other choices out.
+    std::vector<Candidate> reasons;
 
     /** @return Whether it placed a value. */
     bool IsPlacement() const noexcept

@@ -8,6 +8,7 @@
 #include "app/main_view.h"
 #include "app/side_panel.h"
 #include "app/theme.h"
+#include "solver/digits.h"
 #include "solver/puzzle_file.h"
 #include "version.h"
 
@@ -357,6 +358,19 @@ TEST_F(Board, PaintsEveryKindOfSquare)
     }
     BoardPicture picture = controller.Picture();
     picture.clashes      = {1, 2};
+    // A read value ringed, and a read mark on its disc.
+    for (int cell = 0; cell < geometry::kCellCount; ++cell)
+    {
+        const int value = picture.values[static_cast<std::size_t>(cell)];
+        if (value != 0)
+        {
+            picture.reasons.push_back(Candidate{cell, value});
+        }
+        else if (const int candidates = picture.candidates[static_cast<std::size_t>(cell)]; candidates != 0)
+        {
+            picture.reasons.push_back(Candidate{cell, digits::First(candidates)});
+        }
+    }
     board_.SetPicture(picture);
     board_.FocusGained();
     const reckless::gfx::Image focused = Painted(board_);

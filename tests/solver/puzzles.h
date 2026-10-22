@@ -146,6 +146,7 @@ inline std::optional<Technique> ExpectSolvedByDeduction(std::span<const int> giv
         }
         EXPECT_NE(step->description.find_first_not_of(" \t\r\n"), std::string::npos) << name;
         EXPECT_FALSE(step->pattern.empty()) << name << ": " << step->description;
+        EXPECT_FALSE(step->reasons.empty()) << name << ": " << step->description;
         if (!hardest || step->technique > *hardest)
         {
             hardest = step->technique;

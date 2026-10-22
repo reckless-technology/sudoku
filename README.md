@@ -16,7 +16,10 @@ each step what it saw. C++20, its window drawn with Skia on reckless-toolkit, fo
 - **Clue** (F5) takes steps until one places a value; **Solve** (F6) goes on until the board is full or nothing more can
   be deduced. The solver's values are drawn in amber. Every step is listed beside the board in words - "Hidden pair
   {3,7} in row 6 (b6, f6) removes 1 from b6" - and choosing one lights it: the squares it reasoned from washed in
-  amber, the value it placed in green, the candidates it struck in red.
+  amber, the value it placed in green, the candidates it struck in red. What decided it is ringed in amber: the pencil
+  marks it read (a pair's two digits in its two squares, an X-wing's digit in its four corners, the candidate a chain
+  supposes) on amber discs, and for a single the values that rule out its other choices - for a hidden single, the
+  fewest that shut the rest of its row, column or box. A clue's step is lit the same way with the pencil marks hidden.
 - **Check** (F7) searches for the puzzle's solutions and says whether it has none, one or more than one. When Solve stops
   short it says why the same way: no solution, more than one, or one that needs a deeper chain than the solver follows.
 - **Pencil marks** (View, Ctrl+P, or the panel's switch): each empty square shows the digits it may still take, in
@@ -98,7 +101,7 @@ later.
 ### The tools
 
 - `build/release/src/app/sudoku_render <out.png> <state>` draws the window in a state (`empty`, `puzzle`, `clue`,
-  `solved`, `stuck`, `clash`, `no-marks`, `about`) to a PNG, and `sudoku_render <out.png> icon <size>` the icon. The
+  `x-wing`, `solved`, `stuck`, `clash`, `no-marks`, `about`) to a PNG, and `sudoku_render <out.png> icon <size>` the icon. The
   suites run it for every state.
 - `powershell -ExecutionPolicy Bypass -File tools\coverage-windows.ps1` measures the line coverage of `src/` (clang-cl
   and LLVM's source-based coverage, the `coverage-windows` preset) over every suite, the window's launch and the render

@@ -1,5 +1,6 @@
 #include "solver/digits.h"
 #include "solver/techniques/combinations.h"
+#include "solver/techniques/marks.h"
 #include "solver/techniques/techniques.h"
 
 #include <algorithm>
@@ -79,7 +80,8 @@ std::optional<Step> NakedSubset(const Grid &grid, int size)
                 std::string description = "Naked " + std::string(kSizeNames[static_cast<std::size_t>(size)]) + " " +
                                           digits::Format(set) + " in " + unit.Name() + " (" + geometry::Names(subset) +
                                           ") " + Removes(eliminations);
-                return Step{NakedTechnique(size), std::move(description), {}, std::move(eliminations), subset};
+                return Step{NakedTechnique(size),      std::move(description), {}, std::move(eliminations), subset,
+                            MarksIn(grid, subset, set)};
             }
         }
     }
@@ -142,7 +144,8 @@ std::optional<Step> HiddenSubset(const Grid &grid, int size)
                 std::string description = "Hidden " + std::string(kSizeNames[static_cast<std::size_t>(size)]) + " " +
                                           digits::Format(set) + " in " + unit.Name() + " (" + geometry::Names(cells) +
                                           ") " + Removes(eliminations);
-                return Step{HiddenTechnique(size), std::move(description), {}, std::move(eliminations), cells};
+                return Step{HiddenTechnique(size),    std::move(description), {}, std::move(eliminations), cells,
+                            MarksIn(grid, cells, set)};
             }
         }
     }

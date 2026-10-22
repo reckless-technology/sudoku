@@ -1,5 +1,6 @@
 #include "solver/digits.h"
 #include "solver/techniques/combinations.h"
+#include "solver/techniques/marks.h"
 #include "solver/techniques/techniques.h"
 
 #include <algorithm>
@@ -128,7 +129,9 @@ std::optional<Step> FindFish(const Grid &grid, int size, Technique technique)
                                           " in " + base_names + " lies only in " + cover_names + " (" +
                                           geometry::Names(pattern) + "), so the rest of those lines " +
                                           Removes(eliminations);
-                return Step{technique, std::move(description), {}, std::move(eliminations), std::move(pattern)};
+                return Step{technique, std::move(description),
+                            {},        std::move(eliminations),
+                            pattern,   MarksIn(grid, pattern, digits::Bit(digit))};
             }
         }
     }

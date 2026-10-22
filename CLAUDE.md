@@ -16,7 +16,8 @@ C# is in the history, with the solver's design and its puzzles carried over.
   text), `Game` (the givens, the steps, the clashes, undo; every change to the givens rebuilds the board from them).
   The descriptions are what the window shows: change one and its tests change with it.
 - `src/app/` (`sudoku_gui`, `RecklessSudoku`, `sudoku_render`): `Controller` (the window's state and every message, no
-  toolkit), `BoardView` (draws a `BoardPicture`; clicks, the right-click digit menu, the keys), `SidePanel` (headline,
+  toolkit), `BoardView` (draws a `BoardPicture`, the lit step's `Step::reasons` ringed: the marks a technique read,
+  the values that rule out a single's other choices; clicks, the right-click digit menu, the keys), `SidePanel` (headline,
   message, plates, steps list), `MainView` (the series' header with the company mark over the board and the panel),
   `menus`, `AboutView`, `settings_file` (`reckless-technology/sudoku/settings.json`), `theme.h` (the Reckless dark
   look: cream ink, amber accent, Noto Serif, Monaspace Xenon for the pencil marks).

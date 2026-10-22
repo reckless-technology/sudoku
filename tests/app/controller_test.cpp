@@ -94,6 +94,15 @@ TEST(Controller, ACluePlacesAValueSaysItsStepAndLightsIt)
     EXPECT_EQ(picture.pattern, game.steps().back().pattern);
     EXPECT_EQ(picture.values[static_cast<std::size_t>(placed.cell)], placed.digit);
     EXPECT_FALSE(picture.is_given[static_cast<std::size_t>(placed.cell)]);
+    // What the clue read, to ring: the candidate it placed, and the values that rule out the rest.
+    ASSERT_FALSE(picture.reasons.empty());
+    EXPECT_EQ(picture.reasons, game.steps().back().reasons);
+    EXPECT_EQ(picture.reasons.front(), placed);
+    EXPECT_FALSE(picture.IsReasonValue(placed.cell)) << "the value placed is washed green, not ringed";
+    for (std::size_t index = 1; index < picture.reasons.size(); ++index)
+    {
+        EXPECT_TRUE(picture.IsReasonValue(picture.reasons[index].cell)) << picture.reasons[index].Text();
+    }
 }
 
 TEST(Controller, AStepChosenInTheListIsLitAndOnePastTheEndMeansTheLast)
@@ -293,6 +302,55 @@ TEST(Controller, ThePictureCarriesTheValuesTheMarksAndTheStruckCandidates)
     ASSERT_FALSE(lit.struck.empty());
     const Candidate struck = lit.struck.front();
     EXPECT_FALSE(digits::Contains(lit.candidates[static_cast<std::size_t>(struck.cell)], struck.digit));
+    // The marks the step struck and those it read, in the squares the rest of the clue left empty, drawn as such - with
+    // the pencil marks shown or hidden.
+    ASSERT_FALSE(lit.reasons.empty());
+    BoardPicture hidden       = lit;
+    hidden.shows_pencil_marks = false;
+    int drawn                 = 0;
+    for (const std::vector<Candidate> *marks : {&lit.struck, &lit.reasons})
+    {
+        const MarkLook look = marks == &lit.struck ? MarkLook::kStruck : MarkLook::kReason;
+        for (const Candidate &mark : *marks)
+        {
+            if (lit.values[static_cast<std::size_t>(mark.cell)] != 0)
+            {
+                continue;
+            }
+            const bool     is_struck = std::find(lit.struck.begin(), lit.struck.end(), mark) != lit.struck.end();
+            const MarkLook expected  = is_struck ? MarkLook::kStruck : look;
+            EXPECT_EQ(lit.LookOf(mark.cell, mark.digit), expected) << mark.Text();
+            EXPECT_EQ(hidden.LookOf(mark.cell, mark.digit), expected) << mark.Text();
+            drawn++;
+        }
+    }
+    EXPECT_GT(drawn, 0);
+}
+
+TEST(BoardPicture, DrawsEachMarkAndRingsTheValuesTheStepRead)
+{
+    BoardPicture picture;
+    picture.candidates.fill(digits::kAll);
+    picture.values[0]     = 5; // a9 holds 5
+    picture.values[1]     = 7; // b9 holds 7, placed by the step
+    picture.placed        = {1};
+    picture.struck        = {{2, 3}};
+    picture.reasons       = {{0, 5}, {1, 7}, {2, 4}, {2, 3}, {3, 6}};
+    picture.candidates[3] = digits::Bit(1); // d9's 6 read, though struck since
+    EXPECT_EQ(picture.LookOf(0, 5), MarkLook::kHidden) << "a square with a value shows no marks";
+    EXPECT_EQ(picture.LookOf(2, 3), MarkLook::kStruck) << "struck outranks read";
+    EXPECT_EQ(picture.LookOf(2, 4), MarkLook::kReason);
+    EXPECT_EQ(picture.LookOf(2, 5), MarkLook::kPlain);
+    EXPECT_EQ(picture.LookOf(3, 6), MarkLook::kReason);
+    EXPECT_EQ(picture.LookOf(3, 2), MarkLook::kHidden) << "not a candidate";
+    picture.shows_pencil_marks = false;
+    EXPECT_EQ(picture.LookOf(2, 5), MarkLook::kHidden);
+    EXPECT_EQ(picture.LookOf(2, 4), MarkLook::kReason);
+    EXPECT_TRUE(picture.IsReasonValue(0));
+    EXPECT_FALSE(picture.IsReasonValue(1)) << "placed";
+    EXPECT_FALSE(picture.IsReasonValue(2)) << "empty";
+    picture.values[0] = 6;
+    EXPECT_FALSE(picture.IsReasonValue(0)) << "a value the step did not read";
 }
 
 TEST(Menus, TickAndEnableAsThePuzzleStands)

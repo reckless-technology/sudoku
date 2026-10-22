@@ -17,9 +17,10 @@ namespace sudoku::app
 
 /**
  * The board, square and centred: the givens in bold cream, the solver's values in amber, the pencil marks in the
- * monospaced family, and the lit step - its squares washed in amber, the values it placed in green, the candidates it
- * struck in red. A click chooses a square and a right click offers its digits; the arrows move the choice, 1 to 9 enter
- * a given there, and 0, Delete, Backspace or Space clear it.
+ * monospaced family, and the lit step - its squares washed in amber, the pencil marks it read on amber discs and the
+ * values that rule a single's other choices out ringed, the values it placed in green, the candidates it struck in red;
+ * its marks drawn even with the pencil marks hidden. A click chooses a square and a right click offers its digits; the
+ * arrows move the choice, 1 to 9 enter a given there, and 0, Delete, Backspace or Space clear it.
  */
 class BoardView final : public reckless::view::View
 {

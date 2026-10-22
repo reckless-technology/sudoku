@@ -1,7 +1,7 @@
 // The window drawn to a PNG in a chosen state, for review images and the docs: `empty` (a first launch), `puzzle` (an
-// X-wing puzzle just opened), `clue` (twelve clues into it, the last step lit), `solved`, `stuck` (AI Escargot, past
-// every technique), `clash` (two 5s in a row), `no-marks` (the pencil marks off) and `about` (the About card); and with
-// `icon <size>` the app's icon.
+// X-wing puzzle just opened), `clue` (twelve clues into it, the last step lit), `x-wing` (clued until its X-wing, that
+// step lit: the marks it read and those it struck), `solved`, `stuck` (AI Escargot, past every technique), `clash` (two
+// 5s in a row), `no-marks` (the pencil marks off) and `about` (the About card); and with `icon <size>` the app's icon.
 
 #include "app/about_view.h"
 #include "app/board_view.h"
@@ -15,6 +15,7 @@
 #include "View.h"
 #include "version.h"
 
+#include <algorithm>
 #include <cstdio>
 #include <cstdlib>
 #include <fstream>
@@ -165,7 +166,7 @@ int main(int argc, char **argv)
 
     sudoku::app::Controller controller;
     controller.Select(sudoku::geometry::Cell(4, 4));
-    if (state == "puzzle" || state == "clue" || state == "solved" || state == "no-marks")
+    if (state == "puzzle" || state == "clue" || state == "x-wing" || state == "solved" || state == "no-marks")
     {
         const sudoku::Values puzzle = Puzzle(kXWing);
         for (int cell = 0; cell < sudoku::geometry::kCellCount; ++cell)
@@ -180,6 +181,22 @@ int main(int argc, char **argv)
             for (int clue = 0; clue < 12; ++clue)
             {
                 controller.Clue();
+            }
+        }
+        if (state == "x-wing")
+        {
+            const auto is_x_wing = [](const sudoku::Step &step) { return step.technique == sudoku::Technique::kXWing; };
+            for (int clue = 0; clue < 40 && std::none_of(controller.game().steps().begin(),
+                                                         controller.game().steps().end(), is_x_wing);
+                 ++clue)
+            {
+                controller.Clue();
+            }
+            const auto &steps = controller.game().steps();
+            const auto  found = std::find_if(steps.begin(), steps.end(), is_x_wing);
+            if (found != steps.end())
+            {
+                controller.ShowStep(static_cast<std::size_t>(found - steps.begin()));
             }
         }
         if (state == "solved")

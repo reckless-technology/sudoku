@@ -1,6 +1,7 @@
 /// @file technique_test.cpp Each technique on its own: called directly on every puzzle as it is solved, whatever it
-/// finds must be true - so a technique the solver's order rarely reaches is held to the solution all the same - and
-/// found where a pattern is built for it.
+/// finds must be true - so a technique the solver's order rarely reaches is held to the solution all the same - with
+/// every reason it gives a candidate or a value of the board it read; and found where a pattern is built for it, with
+/// the marks and values it read.
 
 #include "puzzles.h"
 
@@ -128,6 +129,15 @@ TEST_P(EachTechnique, WhatItFindsAnywhereIsTrue)
                     << name << ": " << step->description << " strikes what is already gone";
             }
             EXPECT_TRUE(step->IsPlacement() || !step->eliminations.empty()) << step->description << " does nothing";
+            EXPECT_FALSE(step->reasons.empty()) << name << ": " << step->description << " reads nothing";
+            for (const Candidate &reason : step->reasons)
+            {
+                const bool is_mark =
+                    grid.IsEmpty(reason.cell) && digits::Contains(grid.Candidates(reason.cell), reason.digit);
+                const bool is_value = grid.Value(reason.cell) == reason.digit;
+                EXPECT_TRUE(is_mark || is_value) << name << ": " << step->description << " reads " << reason.Text()
+                                                 << ", which the board does not hold";
+            }
         } while (solver.NextStep());
     }
     EXPECT_GT(found, 0) << finder.name << " found nothing on any puzzle";
@@ -177,6 +187,7 @@ TEST(Techniques, ANakedQuadNeedNotHaveEveryDigitInEverySquare)
     ASSERT_TRUE(step);
     EXPECT_EQ(step->technique, Technique::kNakedQuad);
     EXPECT_EQ(step->pattern, (std::vector<int>{0, 1, 2, 3}));
+    EXPECT_EQ(step->reasons, (std::vector<Candidate>{{0, 1}, {0, 2}, {1, 2}, {1, 3}, {2, 3}, {2, 4}, {3, 1}, {3, 4}}));
     std::vector<Candidate> expected;
     for (int cell = 4; cell < 9; cell++)
     {
@@ -245,6 +256,11 @@ TEST(Techniques, AnXWingStrikesTheDigitFromItsColumnsOutsideItsRows)
     std::optional<Step> step = techniques::XWing(grid);
     ASSERT_TRUE(step);
     EXPECT_EQ(step->technique, Technique::kXWing);
+    EXPECT_EQ(step->reasons, (std::vector<Candidate>{{geometry::Cell(2, 1), 5},
+                                                     {geometry::Cell(2, 6), 5},
+                                                     {geometry::Cell(7, 1), 5},
+                                                     {geometry::Cell(7, 6), 5}}))
+        << "its four corners";
     EXPECT_EQ(step->eliminations.size(), 14u);
     for (const Candidate &elimination : step->eliminations)
     {
@@ -252,6 +268,74 @@ TEST(Techniques, AnXWingStrikesTheDigitFromItsColumnsOutsideItsRows)
         int column = geometry::Column(elimination.cell);
         EXPECT_TRUE((column == 1 || column == 6) && row != 2 && row != 7) << elimination.Text();
     }
+}
+
+TEST(Techniques, AHiddenSingleReadsItsPlaceAndTheValuesThatShutTheOthers)
+{
+    Grid grid;
+    // 1 in e8, h7, b5 and c2: row 9 has no place for 1 but a9.
+    for (const int cell : {geometry::Cell(1, 4), geometry::Cell(2, 7), geometry::Cell(4, 1), geometry::Cell(7, 2)})
+    {
+        grid.Place(cell, 1);
+    }
+    std::optional<Step> step = techniques::HiddenSingle(grid);
+    ASSERT_TRUE(step);
+    EXPECT_EQ(step->technique, Technique::kHiddenSingle);
+    EXPECT_EQ(step->placements, (std::vector<Candidate>{{0, 1}}));
+    // The place, then the values that shut the most squares first: e8 (d9 to f9) and h7 (g9 to i9), then b5 and c2.
+    EXPECT_EQ(step->reasons, (std::vector<Candidate>{{0, 1},
+                                                     {geometry::Cell(1, 4), 1},
+                                                     {geometry::Cell(2, 7), 1},
+                                                     {geometry::Cell(4, 1), 1},
+                                                     {geometry::Cell(7, 2), 1}}));
+}
+
+TEST(Techniques, AHiddenSinglesValuesAreTheFewestThatShutTheUnit)
+{
+    Grid grid;
+    // 1 in e8, h7, a3, c2 and i5: row 9 has no place for it but b9. i5 shuts i9, which h7 shuts already.
+    for (const int cell :
+         {geometry::Cell(1, 4), geometry::Cell(2, 7), geometry::Cell(6, 0), geometry::Cell(7, 2), geometry::Cell(4, 8)})
+    {
+        grid.Place(cell, 1);
+    }
+    std::optional<Step> step = techniques::HiddenSingle(grid);
+    ASSERT_TRUE(step);
+    EXPECT_EQ(step->placements, (std::vector<Candidate>{{1, 1}}));
+    EXPECT_EQ(step->reasons, (std::vector<Candidate>{{1, 1},
+                                                     {geometry::Cell(1, 4), 1},
+                                                     {geometry::Cell(2, 7), 1},
+                                                     {geometry::Cell(6, 0), 1},
+                                                     {geometry::Cell(7, 2), 1}}))
+        << "i5 left out";
+}
+
+TEST(Techniques, ANakedSingleReadsItsCandidateAndTheValuesThatRuleOutTheRest)
+{
+    Grid grid;
+    // Round e5: 1 to 4 on row 5, 5 and 6 in column e, 7 and 8 in its box.
+    const int e5 = geometry::Cell(4, 4);
+    for (int column = 0; column < 4; column++)
+    {
+        grid.Place(geometry::Cell(4, column), column + 1);
+    }
+    grid.Place(geometry::Cell(0, 4), 5);
+    grid.Place(geometry::Cell(1, 4), 6);
+    grid.Place(geometry::Cell(3, 3), 7);
+    grid.Place(geometry::Cell(5, 5), 8);
+    std::optional<Step> step = techniques::NakedSingle(grid);
+    ASSERT_TRUE(step);
+    EXPECT_EQ(step->placements, (std::vector<Candidate>{{e5, 9}}));
+    std::vector<Candidate> expected{{e5, 9}};
+    for (int column = 0; column < 4; column++)
+    {
+        expected.push_back(Candidate{geometry::Cell(4, column), column + 1});
+    }
+    expected.push_back(Candidate{geometry::Cell(0, 4), 5});
+    expected.push_back(Candidate{geometry::Cell(1, 4), 6});
+    expected.push_back(Candidate{geometry::Cell(3, 3), 7});
+    expected.push_back(Candidate{geometry::Cell(5, 5), 8});
+    EXPECT_EQ(step->reasons, expected) << "its candidate, then a value for each digit it cannot be";
 }
 
 TEST(Techniques, RemovesNamesEachDigitsSquaresInOrder)

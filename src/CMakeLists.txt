@@ -13,6 +13,7 @@ add_library(sudoku_solver STATIC
     solver/techniques/fish.cpp
     solver/techniques/forcing.cpp
     solver/techniques/intersections.cpp
+    solver/techniques/marks.cpp
     solver/techniques/singles.cpp
     solver/techniques/subsets.cpp
     solver/techniques/wings.cpp)
