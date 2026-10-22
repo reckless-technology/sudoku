@@ -1,0 +1,15 @@
+{
+    // Windows: the Debug build under Visual Studio's debugger (the C/C++ extension's cppvsdbg).
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Reckless Sudoku",
+            "type": "cppvsdbg",
+            "request": "launch",
+            "preLaunchTask": "build",
+            "program": "${workspaceFolder}/build/debug/src/app/RecklessSudoku.exe",
+            "cwd": "${workspaceFolder}",
+            "stopAtEntry": false
+        }
+    ]
+}

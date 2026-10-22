@@ -1,0 +1,10 @@
+#pragma once
+/// @file version.h The version every binary reports, written by CMake from project(), whose version
+/// cmake/sudoku_version.cmake reads from the tags.
+
+namespace sudoku
+{
+
+inline constexpr const char *kVersion = "@PROJECT_VERSION@"; ///< MAJOR.MINOR.BUILD.
+
+} // namespace sudoku

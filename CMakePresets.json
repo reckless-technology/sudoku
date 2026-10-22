@@ -1,0 +1,173 @@
+{
+    "version": 6,
+    "cmakeMinimumRequired": {
+        "major": 3,
+        "minor": 25,
+        "patch": 0
+    },
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "generator": "Ninja",
+            "cacheVariables": {
+                "SUDOKU_BUILD_TESTS": "ON"
+            }
+        },
+        {
+            "name": "debug",
+            "displayName": "Debug: the solver, the window and their suites, unoptimised, with the debugger's information",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "release",
+            "displayName": "Release: the program as it ships, and its suites",
+            "inherits": "base",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release"
+            }
+        },
+        {
+            "name": "release-universal",
+            "displayName": "Release, macOS: one binary for Apple silicon and Intel",
+            "inherits": "release",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Darwin"
+            },
+            "cacheVariables": {
+                "CMAKE_OSX_ARCHITECTURES": "arm64;x86_64"
+            }
+        },
+        {
+            "name": "sanitize",
+            "displayName": "Sanitizers: address and undefined behaviour over everything, unoptimised (gcc or clang)",
+            "inherits": "base",
+            "condition": {
+                "type": "notEquals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug",
+                "SUDOKU_SANITIZE": "ON"
+            }
+        },
+        {
+            "name": "tsan",
+            "displayName": "ThreadSanitizer over everything, optimised a little (gcc or clang)",
+            "inherits": "base",
+            "condition": {
+                "type": "notEquals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "SUDOKU_TSAN": "ON"
+            }
+        },
+        {
+            "name": "coverage-windows",
+            "displayName": "Coverage, Windows: the program's own code unoptimised under clang-cl, LLVM source-based",
+            "inherits": "base",
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            },
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+                "CMAKE_C_COMPILER": "clang-cl",
+                "CMAKE_CXX_COMPILER": "clang-cl",
+                "SUDOKU_COVERAGE": "ON"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "debug",
+            "configurePreset": "debug"
+        },
+        {
+            "name": "release",
+            "configurePreset": "release"
+        },
+        {
+            "name": "release-universal",
+            "configurePreset": "release-universal"
+        },
+        {
+            "name": "sanitize",
+            "configurePreset": "sanitize"
+        },
+        {
+            "name": "tsan",
+            "configurePreset": "tsan"
+        },
+        {
+            "name": "coverage-windows",
+            "configurePreset": "coverage-windows"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "debug",
+            "configurePreset": "debug",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "release",
+            "configurePreset": "release",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "release-universal",
+            "configurePreset": "release-universal",
+            "output": {
+                "outputOnFailure": true
+            }
+        },
+        {
+            "name": "sanitize",
+            "configurePreset": "sanitize",
+            "output": {
+                "outputOnFailure": true
+            },
+            "environment": {
+                "ASAN_OPTIONS": "detect_leaks=1:abort_on_error=1",
+                "LSAN_OPTIONS": "suppressions=${sourceDir}/tools/lsan_suppressions.txt",
+                "UBSAN_OPTIONS": "print_stacktrace=1:halt_on_error=1"
+            }
+        },
+        {
+            "name": "tsan",
+            "configurePreset": "tsan",
+            "output": {
+                "outputOnFailure": true
+            },
+            "environment": {
+                "TSAN_OPTIONS": "halt_on_error=1:second_deadlock_stack=1:suppressions=${sourceDir}/tools/tsan_suppressions.txt"
+            }
+        },
+        {
+            "name": "coverage-windows",
+            "configurePreset": "coverage-windows",
+            "output": {
+                "outputOnFailure": true
+            },
+            "environment": {
+                "LLVM_PROFILE_FILE": "${sourceDir}/build/coverage-windows/profiles/%p-%m.profraw"
+            }
+        }
+    ]
+}
