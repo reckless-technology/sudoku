@@ -15,7 +15,9 @@
 
 #include <algorithm>
 #include <initializer_list>
+#include <set>
 #include <string>
+#include <string_view>
 #include <vector>
 
 namespace sudoku
@@ -249,6 +251,23 @@ TEST(Techniques, RemovesNamesEachDigitsSquaresInOrder)
     EXPECT_EQ(Removes(three), "removes 1 from r1c1, 3 from r4c1, r4c9 and 7 from r5c5");
     EXPECT_EQ(TechniqueName(Technique::kXYZWing), "XYZ-wing");
     EXPECT_EQ((Candidate{40, 5}.Text()), "r5c5=5");
+}
+
+TEST(Techniques, EveryTechniqueHasANameOfItsOwn)
+{
+    // The steps list and its descriptions name each technique: no two may read alike, and none may be the fallback.
+    std::set<std::string_view> names;
+    for (const Technique technique : kTechniques)
+    {
+        const std::string_view name = TechniqueName(technique);
+        EXPECT_FALSE(name.empty());
+        EXPECT_NE(name, "Unknown technique");
+        EXPECT_TRUE(names.insert(name).second) << name << " names two techniques";
+    }
+    EXPECT_EQ(names.size(), kTechniques.size());
+    EXPECT_EQ(TechniqueName(kTechniques.front()), "Naked single");
+    EXPECT_EQ(TechniqueName(Technique::kSimpleColouring), "Simple colouring");
+    EXPECT_EQ(TechniqueName(kTechniques.back()), "Contradiction chain");
 }
 
 TEST(Techniques, TheCombinationsAreEveryChoiceOnceInOrder)

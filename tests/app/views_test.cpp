@@ -20,9 +20,12 @@
 
 #include <gtest/gtest.h>
 
+#include <cstddef>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace sudoku::app
@@ -53,6 +56,86 @@ class TestHost final : public reckless::view::Host
     {
         return reckless::gfx::MeasureText(font, text);
     }
+};
+
+/** A popup that only records what it shows: it lies nowhere on the screen. */
+class ShownPopup final : public reckless::view::Popup
+{
+  public:
+    /**
+     * Whether a point lies in its window: never.
+     * @param screen The point.
+     * @return False.
+     */
+    bool Contains(reckless::gfx::PointI screen) const override
+    {
+        static_cast<void>(screen);
+        return false;
+    }
+};
+
+/**
+ * The window's host with popups and a loop of its own: the last popup's content kept, and what the views ask to run
+ * soon held until it is drained, as the window holds it until the event that asked is over.
+ */
+class PopupHost final : public reckless::view::Host
+{
+  public:
+    /** Nothing to repaint. @param root_area The area. */
+    void Invalidate(reckless::gfx::RectI root_area) override
+    {
+        static_cast<void>(root_area);
+    }
+
+    /**
+     * Text measured as Skia draws it.
+     * @param font The font.
+     * @param text The text.
+     * @return Its width.
+     */
+    float TextWidth(const reckless::gfx::Font &font, std::string_view text) const override
+    {
+        return reckless::gfx::MeasureText(font, text);
+    }
+
+    /**
+     * A popup showing `content`, kept as the last one opened.
+     * @param content The view the popup shows.
+     * @param at Its top left.
+     * @param pressed_outside Run on a press outside it: never here.
+     * @param takes_mouse Whether it takes the mouse.
+     * @return The popup.
+     */
+    std::unique_ptr<reckless::view::Popup> OpenPopup(reckless::view::View &content, reckless::gfx::PointI at,
+                                                     std::function<void(reckless::gfx::PointI)> pressed_outside,
+                                                     bool                                       takes_mouse) override
+    {
+        static_cast<void>(at);
+        static_cast<void>(pressed_outside);
+        static_cast<void>(takes_mouse);
+        shown = &content;
+        return std::make_unique<ShownPopup>();
+    }
+
+    /** Held until Drain. @param call What to run. */
+    void CallSoon(std::function<void()> call) override
+    {
+        soon.push_back(std::move(call));
+    }
+
+    /** Runs what was asked to run soon, in order, until nothing is left. */
+    void Drain()
+    {
+        while (!soon.empty())
+        {
+            std::function<void()> call = std::move(soon.front());
+            soon.erase(soon.begin());
+            call();
+        }
+    }
+
+    reckless::view::View              *shown{nullptr}; ///< The last popup's content.
+    std::vector<std::function<void()>> soon;           ///< What was asked to run soon.
 };
 
 /**
@@ -202,6 +285,48 @@ TEST_F(Board, TheKeysMoveTheChoiceAndEnterDigits)
     command.modifiers.command        = true;
     EXPECT_FALSE(board_.KeyPressed(command)) << "a shortcut is the menu's";
     EXPECT_EQ(digits_.size(), 6u);
+}
+
+TEST_F(Board, ARightClickOffersTheDigitsAndClearForTheSquare)
+{
+    PopupHost host;
+    board_.SetHost(&host);
+    const int    cell = geometry::Cell(2, 5);
+    BoardPicture picture;
+    picture.selected = cell; // as the controller has it once the click chose the square
+    board_.SetPicture(picture);
+
+    // Each choice of the menu: 5, then Clear, each told for the square once the event that chose it is over.
+    for (const int row : {4, 10})
+    {
+        host.shown = nullptr;
+        board_.MouseDown(At(Middle(cell).x, Middle(cell).y, true));
+        ASSERT_NE(host.shown, nullptr) << "no menu opened";
+        auto &menu = static_cast<reckless::view::Menu &>(*host.shown);
+        ASSERT_EQ(menu.items().size(), 11u) << "1 to 9, a rule and Clear";
+        EXPECT_EQ(menu.items()[4].text, "5");
+        EXPECT_TRUE(menu.items()[9].separator);
+        EXPECT_EQ(menu.items()[10].text, "Clear");
+        const reckless::gfx::RectI chosen = menu.RowBounds(static_cast<std::size_t>(row));
+        menu.MouseUp(At(static_cast<float>(chosen.x() + 5), static_cast<float>(chosen.y() + 5)));
+        host.Drain();
+    }
+    EXPECT_EQ(selected_, (std::vector<int>{cell, cell}));
+    EXPECT_EQ(digits_, (std::vector<Candidate>{{cell, 5}, {cell, 0}}));
+
+    // A left click chooses the square and opens no menu.
+    host.shown = nullptr;
+    board_.MouseDown(At(Middle(cell).x, Middle(cell).y));
+    EXPECT_EQ(host.shown, nullptr);
+    board_.SetHost(&host_);
+}
+
+TEST_F(Board, ATooSmallBoardIsNotDrawn)
+{
+    board_.SetBounds({0, 0, 40, 40});
+    const reckless::gfx::Image image = Painted(board_);
+    ASSERT_TRUE(image.IsValid());
+    EXPECT_EQ(image.Bounds().width(), 40);
 }
 
 TEST_F(Board, ListensToNoOneWhenNoOneListens)
