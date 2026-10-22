@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Reckless Sudoku
+GenericName=Sudoku
+Comment=Solve a Sudoku by deduction, a step at a time, with every step explained
+Exec=/opt/reckless-technology/bin/reckless-sudoku %f
+Icon=com.recklesstechnology.sudoku
+Terminal=false
+Categories=Game;LogicGame;
+Keywords=sudoku;puzzle;logic;solver;
+StartupWMClass=Reckless Sudoku
