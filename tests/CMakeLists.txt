@@ -4,6 +4,7 @@ add_executable(sudoku_solver_test
     solver/game_test.cpp
     solver/puzzle_file_test.cpp
     solver/puzzle_test.cpp
+    solver/rated_puzzle_test.cpp
     solver/technique_test.cpp)
 target_link_libraries(sudoku_solver_test PRIVATE sudoku_solver sudoku_warnings GTest::gtest_main)
 target_compile_definitions(sudoku_solver_test PRIVATE SUDOKU_PUZZLES_DIR="${PROJECT_SOURCE_DIR}/puzzles")

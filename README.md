@@ -54,9 +54,12 @@ the suites hold every step to the solution it finds. `Game` is the board a perso
 steps, the clashes, the undo history; every change to the givens rebuilds the board from the givens alone, so nothing
 deduced from a value outlives it. `puzzle_file` reads and writes the files.
 
-The 68 puzzles in `puzzles/` are named for the technique each calls for. The solver finishes all of them. Puzzles built
-to defeat human techniques - AI Escargot, Easter Monster, Arto Inkala's - need chains deeper than one trial followed by
-singles, and the solver stops on them, saying the puzzle has one solution.
+The 68 puzzles in `puzzles/` are named for the technique each calls for. The solver finishes all of them, and every
+puzzle of the Sudoku Exchange puzzle bank - 893,916 puzzles another program made and another rated, from easy to
+diabolical - with no step its solution contradicts: the easy ones by singles alone, the medium ones by nothing past
+pointing. `puzzles/sudoku_exchange` holds a sample of 2,250 of them for the suites. Puzzles built to defeat human
+techniques - AI Escargot, Easter Monster, Arto Inkala's - need chains deeper than one trial followed by singles, and the
+solver stops on them, saying the puzzle has one solution.
 
 ## The window
 
@@ -116,9 +119,11 @@ builds as 0.0.0, with a warning.
 
 ## Tests
 
-- `sudoku_solver_test`: every puzzle solved by deduction with every step checked against the solution; every technique
-  called on every puzzle as it is solved, whatever it finds held to the solution; patterns built for the techniques no
-  puzzle here needs; the game, the files.
+- `sudoku_solver_test`: every puzzle solved by deduction with every step checked against the solution - the 68 in
+  `puzzles/` and the 2,250 of the Sudoku Exchange sample, a test each, the easy ones held to singles and the medium ones
+  to nothing past pairs and the box and line intersections, and the harder bands held to take later techniques; every
+  technique called on every board of the 68 and of 30 diabolical puzzles as they are solved, whatever it finds held to
+  the solution; patterns built for the techniques no puzzle here needs; the game, the files.
 - `sudoku_app_test`: the controller and the menus, the settings file, and the views painted into images and driven by
   events.
 - The render tool drawing every state and the icon, the app's launch (`app_smoke`), and the third-party notices held to
