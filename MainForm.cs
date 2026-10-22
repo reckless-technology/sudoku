@@ -166,11 +166,7 @@ namespace Sudoku
             }
             try
             {
-                System.IO.FileStream fileWriter =
-                    new System.IO.FileStream(saveFileDialog.FileName, System.IO.FileMode.OpenOrCreate);
-                fileWriter.Write(fileBytes, 0, fileBytes.Length);
-                fileWriter.Close();
-                fileWriter.Dispose();
+                System.IO.File.WriteAllBytes(saveFileDialog.FileName, fileBytes);
             }
             catch (System.Exception)
             {
@@ -194,13 +190,9 @@ namespace Sudoku
             try
             {
                 solver = new Solver(3) as ISudokuSolver;
-                System.IO.FileStream fileReader =
-                    new System.IO.FileStream(openFileDialog.FileName, System.IO.FileMode.Open, System.IO.FileAccess.Read,
-                    System.IO.FileShare.Read, 81, false);
-                byte[] fileBytes = new byte[81];
-                fileReader.Read(fileBytes, 0, fileBytes.Length);
-                fileReader.Close();
-                fileReader.Dispose();
+                byte[] fileBytes = System.IO.File.ReadAllBytes(openFileDialog.FileName);
+                if (fileBytes.Length != 81)
+                    throw new System.Exception("Incorrect file format");
                 foreach (byte b in fileBytes)
                 {
                     if (b > 9)

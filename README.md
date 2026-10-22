@@ -30,15 +30,15 @@ turn until one places a value or none makes progress:
 
 ## Building
 
-`Solver.sln` holds the one project, `Sudoku.csproj`, as Visual Studio 2010 left it: it targets the .NET Framework 2.0,
-whose reference assemblies today's MSBuild needs the .NET Framework 3.5 SP1 for, and its ClickOnce settings sign the
-manifests with `Sudoku_TemporaryKey.pfx`, which is not in the repository. With those in place:
+`Sudoku.csproj` is an SDK-style project for .NET 10 on Windows (`net10.0-windows`, Windows Forms); `Solver.sln` holds
+it. With the .NET 10 SDK:
 
 ```
-msbuild Solver.sln -p:Configuration=Release      # bin/Release/Sudoku.exe
+dotnet build Solver.sln -c Release      # bin/Release/net10.0-windows/Sudoku.exe
 ```
 
 ## History
 
 The program began in the `software` repository, under `sudoku/`; it was extracted with its history by git-filter-repo.
-The code, the project files and the puzzles are as they were there.
+The code and the puzzles are as they were there, but for the project file, made SDK-style for .NET 10, and the file
+reading and writing, which read and write a board's 81 bytes whole.
