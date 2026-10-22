@@ -31,7 +31,10 @@ class SettingsFileTest : public ::testing::Test
         file << text;
     }
 
-    std::filesystem::path folder_{std::filesystem::temp_directory_path() / "sudoku-settings-test"};
+    /** A folder of the test's own, so the suites can run side by side. */
+    std::filesystem::path folder_{
+        std::filesystem::temp_directory_path() /
+        (std::string("sudoku-settings-") + ::testing::UnitTest::GetInstance()->current_test_info()->name())};
     std::filesystem::path file_{folder_ / "nested" / "settings.json"};
 };
 

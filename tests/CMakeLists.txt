@@ -10,3 +10,7 @@ target_compile_definitions(sudoku_solver_test PRIVATE SUDOKU_PUZZLES_DIR="${PROJ
 # The test list is read when the tests run, not when they are built: a build never waits on the binary starting. Each
 # parameterised test is named by its own name ("xwing1_sdk", "XYChain"), not by its parameter's printed value.
 gtest_discover_tests(sudoku_solver_test DISCOVERY_MODE PRE_TEST NO_PRETTY_VALUES)
+
+if(SUDOKU_GUI)
+    add_subdirectory(app)
+endif()

@@ -218,7 +218,6 @@ TEST_F(Board, PaintsEveryKindOfSquare)
 {
     Controller   controller;
     const Values puzzle = puzzle_file::Parse(kXWing);
-    controller.Enter(0, 0);
     for (int cell = 0; cell < geometry::kCellCount; ++cell)
     {
         if (puzzle[static_cast<std::size_t>(cell)] != 0)
@@ -335,7 +334,11 @@ TEST_F(Views, TheMainViewDrawsTheHeaderAndLaysOutTheBoardAndThePanel)
     view.Show(controller);
     EXPECT_TRUE(Painted(view).IsValid());
 
-    view.SetMenuBarView(std::make_unique<reckless::app::MenuBarView>(theme::MenuBarLook()));
+    auto menus = std::make_shared<reckless::app::MenuBarController>();
+    menus->Set(
+        reckless::app::MenuBar{{reckless::app::MenuEntry::Menu("File", {reckless::app::MenuEntry::Item("Open", 1)})}},
+        {});
+    view.SetMenuBarView(std::make_unique<reckless::app::MenuBarView>(menus, theme::MenuBarLook()));
     EXPECT_EQ(view.board().bounds().y(), header + theme::MenuBarLook().height) << "the drawn bar above the header";
     EXPECT_TRUE(Painted(view).IsValid());
     view.SetMenuBarView(nullptr);

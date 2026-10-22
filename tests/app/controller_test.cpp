@@ -241,9 +241,10 @@ TEST(Controller, OpensAndSavesPuzzlesAndSaysWhyAFileIsNot)
         std::ofstream file(bad, std::ios::binary);
         file << "123";
     }
+    const int filled = controller.game().FilledCount();
     EXPECT_FALSE(controller.Open(bad));
     EXPECT_EQ(controller.Message().rfind("sudoku-controller-bad.sdk is not a Sudoku puzzle: ", 0), 0u);
-    EXPECT_EQ(controller.game().FilledCount(), 20); // the board as it was
+    EXPECT_EQ(controller.game().FilledCount(), filled); // the board as it was
     EXPECT_FALSE(controller.Save(Scratch("no-such-folder") / "x.sud"));
     EXPECT_EQ(controller.Message().rfind("The puzzle was not saved: ", 0), 0u);
 
@@ -345,7 +346,9 @@ TEST(Menus, RunTheirCommands)
     WindowSizeMenu window;
     window.larger  = 125;
     window.smaller = 75;
-    for (int command : {kOpen, kSave, kQuit, kAbout, kLarger, kSmaller, kWindowSizeBase + 150, kWindowSizeBase + 80})
+    const std::vector<int> commands{
+        kOpen, kSave, kQuit, kAbout, kLarger, kSmaller, kWindowSizeBase + 150, kWindowSizeBase + 80};
+    for (const int command : commands)
     {
         RunCommand(command, controller, handlers, window);
     }
