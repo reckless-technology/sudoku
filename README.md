@@ -27,6 +27,11 @@ each step what it saw. C++20, its window drawn with Skia on reckless-toolkit, fo
 - **Undo** (Ctrl+Z) takes back the last change - a given, a clue, a solve, an opened puzzle or a cleared board - one at a
   time. Changing a given clears the solver's values, which were deduced from the old givens; Clue or Solve finds them
   again.
+- **New puzzle** (File > New puzzle, Ctrl+1 to Ctrl+4, or the panel's plates): a puzzle of the band chosen - Easy,
+  Medium, Hard or Diabolical - picked at random from the Sudoku Exchange puzzle bank, which every package installs
+  beside the program; the message names it, its rating and how many the band holds. Undo takes it back as it does an
+  opened file. Without the bank (a build with `-DSUDOKU_PUZZLE_BANK=OFF`) the plates are dimmed and the menu's choices
+  disabled.
 - **Files** (File, Ctrl+O and Ctrl+S): a `.sud` file is 81 bytes, one per square row by row from the top left, 0 for an
   empty square; a `.sdk` file is nine lines of nine characters, `.` for an empty square. Open reads either, and any text
   file holding 81 squares; Save writes the givens. A puzzle's file named on the command line opens with the window.
@@ -60,7 +65,8 @@ deduced from a value outlives it. `puzzle_file` reads and writes the files.
 The 68 puzzles in `puzzles/` are named for the technique each calls for. The solver finishes all of them, and every
 puzzle of the Sudoku Exchange puzzle bank - 893,916 puzzles another program made and another rated, from easy to
 diabolical - with no step its solution contradicts: the easy ones by singles alone, the medium ones by nothing past
-pointing. `puzzles/sudoku_exchange` holds a sample of 2,250 of them for the suites. Puzzles built to defeat human
+pointing. `puzzles/sudoku_exchange` holds a sample of 2,250 of them for the suites; the whole bank is what New puzzle
+draws from. `puzzle_bank` reads it: four files of 100-byte records, so a puzzle is read by its index with one seek. Puzzles built to defeat human
 techniques - AI Escargot, Easter Monster, Arto Inkala's - need chains deeper than one trial followed by singles, and the
 solver stops on them, saying the puzzle has one solution.
 
@@ -71,13 +77,17 @@ mark, the name and the version; the dark window with cream ink and the amber acc
 Monaspace Xenon for the pencil marks. `Controller` holds the window's state and words every message, written against no
 toolkit; `BoardView` draws a `BoardPicture` at any size and takes the mouse and the keys; `SidePanel` holds the headline,
 the message, the plates and the steps list; `MainView` lays them out under the header; `menus` builds the menu bar;
-`AboutView` is Help > About; `settings_file` keeps the choices. `sudoku_render` draws the window in a chosen state to a
+`AboutView` is Help > About; `settings_file` keeps the choices; `puzzle_bank_folder` finds the puzzle bank where the
+build and the installers put it. `sudoku_render` draws the window in a chosen state to a
 PNG, and the app's icon at any size (`tools/make_icon.py` packs it into `assets/icon/`).
 
 ## Building
 
 The window is built on reckless-toolkit, a private git submodule at `external/reckless-toolkit`; `-DSUDOKU_GUI=OFF`
-builds the solver and its suite alone, with no submodule.
+builds the solver and its suite alone, with no submodule. The build fetches the Sudoku Exchange puzzle bank
+(`cmake/sudoku_puzzle_bank.cmake`: its four files, 89 MB, at the commit the sample was taken from, each held to its
+SHA-256) once into the fetches' folder, and puts it beside the program - `puzzles/` beside the executable, or the
+bundle's `Contents/Resources/puzzles` on macOS; `-DSUDOKU_PUZZLE_BANK=OFF` builds without it.
 
 On Windows, in Visual Studio's developer environment (`VsDevCmd.bat -arch=x64 -host_arch=x64 -no_logo`), with CMake and
 Ninja:
@@ -137,8 +147,9 @@ builds as 0.0.0, with a warning.
 `packaging/` turns a release build tree into what is shipped, the same way on a pull request's run and a release's:
 
 - `packaging/stage.py <build-dir> <dist-dir> windows|linux|macos` stages the program (`RecklessSudoku.exe`,
-  `reckless-sudoku` or `RecklessSudoku.app`), `EULA.txt` and `THIRD-PARTY-NOTICES.txt` into a folder of their own;
-  everything after it reads the stage.
+  `reckless-sudoku` or `RecklessSudoku.app`), the puzzle bank (`puzzles/`, in the bundle on macOS), `EULA.txt` and
+  `THIRD-PARTY-NOTICES.txt` into a folder of their own; everything after it reads the stage, and a build tree without
+  the whole bank stops it.
 - Windows: `packaging/windows/make_installer.ps1` compiles `sudoku.iss` with Inno Setup 6.7.3 (fetched and held to its
   hash with `-Fetch`) into `reckless-sudoku-<version>-win64-setup.exe`. It shows the end-user licence, then installs for
   the current user by default, under the user's Programs folder in `Reckless Technology\Sudoku`, or, at the dialog's
@@ -155,7 +166,8 @@ builds as 0.0.0, with a warning.
   `test_installer.sh` holds the package to the stage and runs the uninstaller's script on a stand-in for `/` beside
   another product's app. `sign.sh` signs the staged app for a release.
 - Linux: `packaging/linux/make_deb.sh` makes the Debian package `reckless-sudoku-<version>-linux-amd64.deb` - the
-  program at `/opt/reckless-technology/bin/reckless-sudoku`, a menu entry, the icon, the licence, the notices and a copyright
+  program at `/opt/reckless-technology/bin/reckless-sudoku`, the puzzle bank in
+  `/opt/reckless-technology/share/reckless-sudoku/puzzles`, a menu entry, the icon, the licence, the notices and a copyright
   file under `/usr/share/doc/reckless-sudoku` - its Depends read off the binary; `test_deb.sh` holds it to the stage.
   `make_tarball.sh` makes the portable `reckless-sudoku-<version>-linux-x64.tar.xz`, the stage in one folder, and holds
   it to the stage.
@@ -202,7 +214,8 @@ toolkit's `tools/sign-mac.sh`, when `MACOS_DEVELOPER_ID_APPLICATION_P12` is set)
 
 Reckless Sudoku is proprietary (`LICENSE`); the program is licensed to the people who use it under `EULA.txt`, which
 every installer shows and carries. The third-party parts the executable contains (Skia with libpng, zlib and, on Linux,
-FreeType; the Noto Serif and Monaspace Xenon typefaces) are listed with their licences in `THIRD-PARTY-NOTICES.txt`,
+FreeType; the Noto Serif and Monaspace Xenon typefaces) and the public-domain puzzle bank installed beside it are listed
+with their licences in `THIRD-PARTY-NOTICES.txt`,
 which every package installs. Help > About says both in a line each, as every Reckless app's About does.
 
 ## History

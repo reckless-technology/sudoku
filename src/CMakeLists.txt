@@ -6,6 +6,7 @@ add_library(sudoku_solver STATIC
     solver/game.cpp
     solver/geometry.cpp
     solver/grid.cpp
+    solver/puzzle_bank.cpp
     solver/puzzle_file.cpp
     solver/solver.cpp
     solver/step.cpp

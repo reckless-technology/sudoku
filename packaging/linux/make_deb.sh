@@ -4,6 +4,8 @@
 #
 #   /opt/reckless-technology/bin/reckless-sudoku
 #       the program, beside the organisation's other apps
+#   /opt/reckless-technology/share/reckless-sudoku/puzzles/
+#       the puzzle bank it offers new puzzles from, where it looks for it beside its bin folder
 #   /usr/share/applications/com.recklesstechnology.sudoku.desktop
 #       the menu entry
 #   /usr/share/icons/hicolor/256x256/apps/com.recklesstechnology.sudoku.png
@@ -21,12 +23,13 @@
 #   packaging/linux/make_deb.sh <dist-dir> <version> <out.deb>
 set -euo pipefail
 
-[ $# -eq 3 ] || { sed -n '2,21p' "$0" >&2; exit 2; }
+[ $# -eq 3 ] || { sed -n '2,23p' "$0" >&2; exit 2; }
 dist=$(cd "$1" && pwd)
 version=$2
 out=$3
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "make_deb.sh: the version is MAJOR.MINOR.BUILD, not $version" >&2; exit 2; }
-for file in reckless-sudoku EULA.txt THIRD-PARTY-NOTICES.txt; do
+for file in reckless-sudoku puzzles/easy.txt puzzles/medium.txt puzzles/hard.txt puzzles/diabolical.txt EULA.txt \
+    THIRD-PARTY-NOTICES.txt; do
     [ -e "$dist/$file" ] || { echo "make_deb.sh: $dist has no $file: stage it with packaging/stage.py" >&2; exit 1; }
 done
 here=$(cd "$(dirname "$0")" && pwd)
@@ -41,9 +44,11 @@ pkg="$work/reckless-sudoku"
 id=com.recklesstechnology.sudoku
 doc="$pkg/usr/share/doc/reckless-sudoku"
 
-install -d -m 0755 "$pkg/DEBIAN" "$pkg/opt/reckless-technology/bin" "$pkg/usr/share/applications" \
+bank="$pkg/opt/reckless-technology/share/reckless-sudoku/puzzles"
+install -d -m 0755 "$pkg/DEBIAN" "$pkg/opt/reckless-technology/bin" "$bank" "$pkg/usr/share/applications" \
     "$pkg/usr/share/icons/hicolor/256x256/apps" "$doc"
 install -m 0755 "$dist/reckless-sudoku" "$pkg/opt/reckless-technology/bin/reckless-sudoku"
+install -m 0644 "$dist/puzzles/"*.txt "$bank/"
 install -m 0644 "$here/$id.desktop" "$pkg/usr/share/applications/$id.desktop"
 install -m 0644 "$root/assets/icon/icon_256.png" "$pkg/usr/share/icons/hicolor/256x256/apps/$id.png"
 install -m 0644 "$dist/EULA.txt" "$dist/THIRD-PARTY-NOTICES.txt" "$doc/"

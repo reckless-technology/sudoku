@@ -43,6 +43,8 @@ endif()
 
 option(SUDOKU_BUILD_TESTS "Build the test suites" ON)
 option(SUDOKU_GUI "Build the window on the toolkit submodule (external/reckless-toolkit)" ON)
+option(SUDOKU_PUZZLE_BANK "Fetch the Sudoku Exchange puzzle bank and put it beside the app, which offers new puzzles from it"
+       ON)
 option(SUDOKU_COVERAGE "Instrument the program's own code for coverage (gcc, clang or clang-cl)" OFF)
 option(SUDOKU_SANITIZE "Build everything with AddressSanitizer and UndefinedBehaviorSanitizer (gcc or clang)" OFF)
 option(SUDOKU_TSAN "Build everything with ThreadSanitizer (gcc or clang)" OFF)

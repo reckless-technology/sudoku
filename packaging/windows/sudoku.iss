@@ -1,8 +1,8 @@
 ; The Windows installer of a staged release (packaging/stage.py windows), compiled by packaging/windows/make_installer.ps1
 ; with Inno Setup 6:
 ;   ISCC /DSudokuVersion=<MAJOR.MINOR.BUILD> /DStageDir=<dist> /DOutputDir=<out> packaging\windows\sudoku.iss
-; The program, its end-user licence (shown before anything is installed) and the third-party notices, a Start-menu
-; entry and an uninstaller. A per-user install by default (no administrator asked, under the user's Programs folder:
+; The program, the puzzle bank it offers new puzzles from (puzzles\ beside it), its end-user licence (shown before
+; anything is installed) and the third-party notices, a Start-menu entry and an uninstaller. A per-user install by default (no administrator asked, under the user's Programs folder:
 ; Reckless Technology\Sudoku there); the dialog offers a machine-wide one, under Program Files\Reckless Technology\Sudoku,
 ; beside the organisation's other products. The uninstaller takes away what the installer put there and nothing else:
 ; the person's settings in their own folder (reckless-technology\sudoku under %APPDATA%) are theirs, and the other
@@ -80,6 +80,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 
 [Files]
 Source: "{#StageDir}\{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#StageDir}\puzzles\*.txt"; DestDir: "{app}\puzzles"; Flags: ignoreversion
 Source: "{#StageDir}\EULA.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
 

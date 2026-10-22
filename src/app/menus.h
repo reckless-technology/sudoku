@@ -1,6 +1,6 @@
 #pragma once
-/// @file menus.h The menu bar - File, Edit, Puzzle, View and Help - each choice ticked and enabled as the puzzle
-/// stands, and what each command does.
+/// @file menus.h The menu bar - File (with New puzzle's four bands), Edit, Puzzle, View and Help - each choice ticked
+/// and enabled as the puzzle stands, and what each command does.
 
 #include "app/controller.h"
 
@@ -32,16 +32,21 @@ enum Command : int
     kLarger         = 10,  ///< The window a size larger.
     kSmaller        = 11,  ///< A size smaller.
     kAbout          = 12,  ///< The About card.
+    kNewEasy        = 13,  ///< A new easy puzzle from the bank; kNewEasy + a band's place in kBands for the others.
+    kNewMedium      = 14,  ///< A new medium puzzle.
+    kNewHard        = 15,  ///< A new hard puzzle.
+    kNewDiabolical  = 16,  ///< A new diabolical puzzle.
     kWindowSizeBase = 200, ///< kWindowSizeBase + percent: the window at that size.
 };
 
 /** What the bar shows: the choices and what can be done now. */
 struct MenuState
 {
-    Settings       settings;        ///< The choices, ticked.
-    bool           can_undo{false}; ///< Undo is enabled.
-    bool           can_run{false};  ///< Clue and Solve are enabled.
-    WindowSizeMenu window;          ///< The window's sizes.
+    Settings       settings;               ///< The choices, ticked.
+    bool           can_undo{false};        ///< Undo is enabled.
+    bool           can_run{false};         ///< Clue and Solve are enabled.
+    bool           has_puzzle_bank{false}; ///< New puzzle's choices are enabled.
+    WindowSizeMenu window;                 ///< The window's sizes.
 
     /**
      * @param other Another state.

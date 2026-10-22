@@ -55,10 +55,11 @@ SidePanel::SidePanel()
     message_                         = std::make_unique<MessageView>();
     AddChild(*headline_);
     AddChild(*message_);
+    new_section_   = std::make_unique<reckless::app::Section>(shell, "New puzzle");
     solve_section_ = std::make_unique<reckless::app::Section>(shell, "Solve");
     board_section_ = std::make_unique<reckless::app::Section>(shell, "Board");
     steps_section_ = std::make_unique<reckless::app::Section>(shell, "Steps");
-    for (auto *section : {solve_section_.get(), board_section_.get(), steps_section_.get()})
+    for (auto *section : {new_section_.get(), solve_section_.get(), board_section_.get(), steps_section_.get()})
     {
         AddChild(*section);
     }
@@ -68,6 +69,16 @@ SidePanel::SidePanel()
             callback();
         }
     };
+    for (std::size_t index = 0; index < new_puzzle_.size(); ++index)
+    {
+        const puzzle_bank::Band band = puzzle_bank::kBands[index];
+        new_puzzle_[index]           = AddPlate(std::string(puzzle_bank::BandName(band)), [this, band] {
+            if (on_new_puzzle)
+            {
+                on_new_puzzle(band);
+            }
+        });
+    }
     clue_  = AddPlate("Clue", [this, tell] { tell(on_clue); });
     solve_ = AddPlate("Solve", [this, tell] { tell(on_solve); });
     check_ = AddPlate("Check", [this, tell] { tell(on_check); });
@@ -118,6 +129,13 @@ reckless::view::Button *SidePanel::plate(std::string_view text) noexcept
             return button;
         }
     }
+    for (const std::unique_ptr<reckless::view::Button> &button : new_puzzle_)
+    {
+        if (button->text() == text)
+        {
+            return button.get();
+        }
+    }
     return nullptr;
 }
 
@@ -129,6 +147,10 @@ void SidePanel::Show(const Controller &controller)
                          : game.IsSolved()                               ? theme::kGood
                                                                          : theme::kInk);
     message_->SetText(controller.Message());
+    for (const std::unique_ptr<reckless::view::Button> &button : new_puzzle_)
+    {
+        button->SetDimmed(!controller.HasPuzzleBank());
+    }
     const bool can_run = controller.CanRun();
     clue_->SetDimmed(!can_run);
     solve_->SetDimmed(!can_run);
@@ -197,6 +219,7 @@ void SidePanel::Resized()
         }
         y += section_height + 8;
     };
+    lay_row(*new_section_, {new_puzzle_[0].get(), new_puzzle_[1].get(), new_puzzle_[2].get(), new_puzzle_[3].get()});
     lay_row(*solve_section_, {clue_.get(), solve_.get(), check_.get()});
     // Undo and Clear narrower, the switch's caption wider.
     board_section_->SetBounds({kMargin, y, inner, section_height});

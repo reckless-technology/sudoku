@@ -9,7 +9,8 @@ the fetched headers or the fonts themselves, so the notices can only say what th
 ones the executable holds, read off its link map: Skia and the libraries it bundles, which the window draws through -
 Skia's own code with its colour management (skcms) and its PNG decoder, libpng and zlib, whose SIMD routines are the
 Chromium authors', and on Linux FreeType - and the two typefaces it carries, Noto Serif for the interface and Monaspace
-Xenon for the pencil marks. Of the toolkit's other fetches none is in the executable: Monocypher (the licence check) and
+Xenon for the pencil marks - and the puzzle bank installed beside it, the Sudoku Exchange's, whose commit is read from
+cmake/sudoku_puzzle_bank.cmake and whose licence from the repository's sample of it. Of the toolkit's other fetches none is in the executable: Monocypher (the licence check) and
 the audio file decoders (dr_libs, stb) have nothing of theirs linked, the audio device layer (RtAudio, RtMidi) and the
 ASIO SDK are not built (RECKLESS_BUILD_AUDIO is off), and GoogleTest is the suites' alone. The skia-pack carries the
 licences of libpng, zlib and FreeType, read from it here; Skia's own and the Chromium source tree's, which the pack
@@ -190,8 +191,12 @@ def build(build_dir):
     freetype_credit = " ".join(re.search(r'"""\s*(Portions of this software.*?)\s*"""', ftl, re.S).group(1).split())
     freetype_credit = freetype_credit.replace("<year>", freetype_year)
 
+    bank_commit = re.search(r"set\(SUDOKU_PUZZLE_BANK_COMMIT ([0-9a-f]{40})\)",
+                            read(ROOT / "cmake" / "sudoku_puzzle_bank.cmake")).group(1)
+    bank_licence = read(ROOT / "puzzles" / "sudoku_exchange" / "LICENSE.txt").strip("\n")
+
     # The sections in their order, each numbered by its place.
-    keys = ["noto", "monaspace", "skia", "png_skia", "zlib_skia", "freetype"]
+    keys = ["noto", "monaspace", "skia", "png_skia", "zlib_skia", "freetype", "bank"]
     n = {key: i + 1 for i, key in enumerate(keys)}
     sections = {
         "noto": (f"Noto Serif {noto_version}", APP, prose(
@@ -218,6 +223,11 @@ def build(build_dir):
         "freetype": (f"FreeType {freetype_version}, in Skia", f"{APP} on Linux", prose(
             "This software is based in part on the work of the FreeType Team. FreeType is used under the FreeType "
             "License, the first of the two licences it offers.", freetype_credit), ftl),
+        "bank": (f"Sudoku Exchange puzzle bank, commit {bank_commit[:7]}", f"{APP}'s puzzles", prose(
+            "Reckless Sudoku installs the Sudoku Exchange \"Puzzle Bank\" (https://github.com/grantm/sudoku-exchange-"
+            f"puzzle-bank, commit {bank_commit}) beside its executable, unchanged, and offers new puzzles from it: "
+            "puzzles QQWing generated, rated by Sukaku Explainer. Its authors put it in the public domain:"),
+            bank_licence),
     }
 
     rows = []
@@ -225,9 +235,9 @@ def build(build_dir):
         title, used = sections[key][0], sections[key][1]
         rows.append(f"  {n[key]:>2}. {title.split(',')[0]:<44} {used}")
     head = ("THIRD-PARTY NOTICES\n\n" + prose(
-        "Reckless Sudoku is copyright (C) 2008-2026 Jonny Reckless and licensed under EULA.txt. Its executable "
-        "contains the third-party software below, each part used under its own licence, which this file reproduces "
-        "wherever the licence asks for it. Nothing in EULA.txt limits any right these licences give you.") +
+        "Reckless Sudoku is copyright (C) 2008-2026 Jonny Reckless and licensed under EULA.txt. Its executable, and "
+        "the puzzles installed beside it, contain the third-party software and data below, each part used under its "
+        "own licence, which this file reproduces wherever the licence asks for it. Nothing in EULA.txt limits any right these licences give you.") +
         "\n\nWhere each part is used\n\n" + "\n".join(rows) + "\n")
     parts = [head] + [section(n[key], *sections[key]) for key in keys]
     return "\n\n".join(s.rstrip("\n") for s in parts) + "\n"

@@ -13,13 +13,15 @@ C# is in the history, with the solver's design and its puzzles carried over.
 - `src/solver/` (`sudoku_solver`, no toolkit): `Grid` (values and candidates), `Step` and `Technique`, the techniques in
   `techniques/` (each returns its first deduction without changing the board), `Solver` (simplest first, starting again
   after each step), `CountSolutions` (`brute_force.h`, the search that checks a puzzle), `puzzle_file` (`.sud` bytes and
-  text), `Game` (the givens, the steps, the clashes, undo; every change to the givens rebuilds the board from them).
+  text), `puzzle_bank` (the Sudoku Exchange bank's four files of 100-byte records, a record read by its index), `Game`
+  (the givens, the steps, the clashes, undo; every change to the givens rebuilds the board from them).
   The descriptions are what the window shows: change one and its tests change with it.
 - `src/app/` (`sudoku_gui`, `RecklessSudoku`, `sudoku_render`): `Controller` (the window's state and every message, no
   toolkit), `BoardView` (draws a `BoardPicture`, the lit step's `Step::reasons` ringed: the marks a technique read,
   the values that rule out a single's other choices; clicks, the right-click digit menu, the keys), `SidePanel` (headline,
   message, plates, steps list), `MainView` (the series' header with the company mark over the board and the panel),
-  `menus`, `AboutView`, `settings_file` (`reckless-technology/sudoku/settings.json`), `theme.h` (the Reckless dark
+  `menus`, `AboutView`, `settings_file` (`reckless-technology/sudoku/settings.json`), `puzzle_bank_folder` (the bank
+  beside the executable, in the bundle's Resources, or in `share/reckless-sudoku` for the .deb; New puzzle's source), `theme.h` (the Reckless dark
   look: cream ink, amber accent, Noto Serif, Monaspace Xenon for the pencil marks).
 - `tests/solver/` (`sudoku_solver_test`): every puzzle in `puzzles/` solved with every step held to the solution, every
   technique called directly on every board on the way and held to it, built patterns for those no puzzle needs; and the
@@ -27,7 +29,10 @@ C# is in the history, with the solver's design and its puzzles carried over.
   test each, the easy and medium bands held to the techniques their ratings allow. The whole bank (893,916 puzzles)
   solves; a change to the solver's order or its techniques is checked against the sample, and against the bank by hand
   when it could matter.
-  `tests/app/` (`sudoku_app_test`): controller, menus, settings file, views painted and driven.
+  `tests/app/` (`sudoku_app_test`): controller, menus, new puzzles from the bank (the sample standing in for it),
+  settings file, views painted and driven.
+- The whole bank ships with every package (89 MB; `cmake/sudoku_puzzle_bank.cmake` fetches it pinned by commit and
+  SHA-256, `packaging/stage.py` refuses a tree without it); the notices credit it (`tools/third_party_notices.py`).
 - `assets/icon/`: the icon at every size, drawn by `sudoku_render <out.png> icon <size>` and packed by
   `tools/make_icon.py` (Pillow); change the drawing (`render_main.cpp`'s `RenderIcon`), run the script, commit what it
   writes - never edit a render.

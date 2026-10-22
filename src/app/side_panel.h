@@ -1,6 +1,7 @@
 #pragma once
-/// @file side_panel.h The panel beside the board: where the puzzle stands and what was last done, the solver's plates,
-/// undo and clear, the pencil marks' switch, and the steps taken - choosing one lights it on the board.
+/// @file side_panel.h The panel beside the board: where the puzzle stands and what was last done, a new puzzle of each
+/// band, the solver's plates, undo and clear, the pencil marks' switch, and the steps taken - choosing one lights it on
+/// the board.
 
 #include "app/controller.h"
 
@@ -9,6 +10,7 @@
 #include "ListView.h"
 #include "View.h"
 
+#include <array>
 #include <cstddef>
 #include <functional>
 #include <memory>
@@ -68,8 +70,9 @@ class StepsModel final : public reckless::view::ListModel
 };
 
 /**
- * The panel: a headline of where the puzzle stands and a message of what was last done, then sections of plates - Clue,
- * Solve and Check; Undo and Clear; the pencil marks' switch - and the steps list. Show() sets it from the controller
+ * The panel: a headline of where the puzzle stands and a message of what was last done, then sections of plates - a
+ * new puzzle of each band, dimmed without the puzzle bank; Clue, Solve and Check; Undo and Clear; the pencil marks'
+ * switch - and the steps list. Show() sets it from the controller
  * each frame; the `on_*` callbacks tell what the person chose.
  */
 class SidePanel final : public reckless::view::View
@@ -79,6 +82,7 @@ class SidePanel final : public reckless::view::View
 
     SidePanel();
 
+    std::function<void(puzzle_bank::Band band)>     on_new_puzzle;   ///< "Easy" to "Diabolical": a new puzzle.
     std::function<void()>                           on_clue;         ///< "Clue".
     std::function<void()>                           on_solve;        ///< "Solve".
     std::function<void()>                           on_check;        ///< "Check".
@@ -118,7 +122,8 @@ class SidePanel final : public reckless::view::View
     }
 
     /**
-     * @param text A plate's caption: "Clue", "Solve", "Check", "Undo", "Clear" or "Pencil marks".
+     * @param text A plate's caption: a band's ("Easy", "Diabolical"), "Clue", "Solve", "Check", "Undo", "Clear" or
+     * "Pencil marks".
      * @return The plate; null for another caption.
      */
     reckless::view::Button *plate(std::string_view text) noexcept;
@@ -137,21 +142,23 @@ class SidePanel final : public reckless::view::View
     std::unique_ptr<reckless::view::Button> AddPlate(std::string text, std::function<void()> clicked,
                                                      bool is_toggle = false);
 
-    std::unique_ptr<reckless::app::TextLine>  headline_;          ///< Where the puzzle stands.
-    std::unique_ptr<MessageView>              message_;           ///< What was last done.
-    std::unique_ptr<reckless::app::Section>   solve_section_;     ///< "Solve".
-    std::unique_ptr<reckless::app::Section>   board_section_;     ///< "Board".
-    std::unique_ptr<reckless::app::Section>   steps_section_;     ///< "Steps".
-    std::unique_ptr<reckless::view::Button>   clue_;              ///< "Clue".
-    std::unique_ptr<reckless::view::Button>   solve_;             ///< "Solve".
-    std::unique_ptr<reckless::view::Button>   check_;             ///< "Check".
-    std::unique_ptr<reckless::view::Button>   undo_;              ///< "Undo".
-    std::unique_ptr<reckless::view::Button>   clear_;             ///< "Clear".
-    std::unique_ptr<reckless::view::Button>   pencil_marks_;      ///< "Pencil marks", a switch.
-    StepsModel                                steps_model_;       ///< The list's rows.
-    std::unique_ptr<reckless::view::ListView> steps_;             ///< The steps list.
-    std::optional<std::size_t>                shown_step_;        ///< The step the list has chosen, as last set.
-    bool                                      is_showing_{false}; ///< Show() is setting the list: no on_step.
+    std::unique_ptr<reckless::app::TextLine>               headline_;    ///< Where the puzzle stands.
+    std::unique_ptr<MessageView>                           message_;     ///< What was last done.
+    std::unique_ptr<reckless::app::Section>                new_section_; ///< "New puzzle".
+    std::array<std::unique_ptr<reckless::view::Button>, 4> new_puzzle_;  ///< A plate for each band, the easiest first.
+    std::unique_ptr<reckless::app::Section>                solve_section_; ///< "Solve".
+    std::unique_ptr<reckless::app::Section>                board_section_; ///< "Board".
+    std::unique_ptr<reckless::app::Section>                steps_section_; ///< "Steps".
+    std::unique_ptr<reckless::view::Button>                clue_;          ///< "Clue".
+    std::unique_ptr<reckless::view::Button>                solve_;         ///< "Solve".
+    std::unique_ptr<reckless::view::Button>                check_;         ///< "Check".
+    std::unique_ptr<reckless::view::Button>                undo_;          ///< "Undo".
+    std::unique_ptr<reckless::view::Button>                clear_;         ///< "Clear".
+    std::unique_ptr<reckless::view::Button>                pencil_marks_;  ///< "Pencil marks", a switch.
+    StepsModel                                             steps_model_;   ///< The list's rows.
+    std::unique_ptr<reckless::view::ListView>              steps_;         ///< The steps list.
+    std::optional<std::size_t>                             shown_step_; ///< The step the list has chosen, as last set.
+    bool is_showing_{false};                                            ///< Show() is setting the list: no on_step.
 };
 
 } // namespace sudoku::app

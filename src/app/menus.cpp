@@ -35,12 +35,22 @@ MenuEntry Item(std::string title, int command, bool is_checked = false, Shortcut
 
 MenuState MenuStateOf(const Controller &controller, const WindowSizeMenu &window)
 {
-    return MenuState{controller.settings(), controller.game().CanUndo(), controller.CanRun(), window};
+    return MenuState{controller.settings(), controller.game().CanUndo(), controller.CanRun(),
+                     controller.HasPuzzleBank(), window};
 }
 
 reckless::app::MenuBar BuildMenuBar(const MenuState &state)
 {
-    std::vector<MenuEntry> file{Item("Open...", kOpen, false, Shortcut::Primary('o')),
+    // New puzzle: a band each, Ctrl+1 to Ctrl+4, the easiest first.
+    std::vector<MenuEntry> bands;
+    for (std::size_t index = 0; index < puzzle_bank::kBands.size(); ++index)
+    {
+        bands.push_back(Item(std::string(puzzle_bank::BandName(puzzle_bank::kBands[index])),
+                             kNewEasy + static_cast<int>(index), false,
+                             Shortcut::Primary(static_cast<char>('1' + index)), state.has_puzzle_bank));
+    }
+    std::vector<MenuEntry> file{MenuEntry::Menu("New puzzle", std::move(bands)),
+                                Item("Open...", kOpen, false, Shortcut::Primary('o')),
                                 Item("Save...", kSave, false, Shortcut::Primary('s')), MenuEntry::Separator(),
                                 Item("Quit", kQuit, false, Shortcut::Primary('q'))};
     std::vector<MenuEntry> edit{Item("Undo", kUndo, false, Shortcut::Primary('z'), state.can_undo),
@@ -91,6 +101,12 @@ void RunCommand(int command, Controller &controller, const CommandHandlers &hand
     }
     switch (command)
     {
+    case kNewEasy:
+    case kNewMedium:
+    case kNewHard:
+    case kNewDiabolical:
+        controller.NewPuzzle(puzzle_bank::kBands[static_cast<std::size_t>(command - kNewEasy)]);
+        break;
     case kOpen:
         tell(handlers.open);
         break;
