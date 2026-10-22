@@ -72,6 +72,7 @@ int main(int argc, char **argv)
     std::unique_ptr<sudoku::app::AboutView> about;
     const auto                              show_about = [&] {
         about           = std::make_unique<sudoku::app::AboutView>(sudoku::kVersion);
+        about->open_url = [](const std::string &url) { reckless::window::OpenInBrowser(url); };
         about->on_close = [&] {
             view.SetOverlay(nullptr);
             platform->CallSoon([&] { about.reset(); });
