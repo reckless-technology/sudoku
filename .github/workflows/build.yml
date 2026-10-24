@@ -11,7 +11,8 @@ name: build
 # nothing; .github/actions/cpp installs what an image lacks. The organisation's self-hosted runners are not used:
 # its runner group does not serve public repositories, and opening it to them would let a fork's pull request run
 # on Jonny's machines. The window is built on the
-# toolkit, a private submodule read through its read-only deploy key (.github/actions/toolkit). Every checkout is whole
+# toolkit, whose files are a git subtree in this repository (external/reckless-toolkit), so a checkout has
+# them and no job fetches anything of its own. Every checkout is whole
 # (fetch-depth 0): the version every binary reports is MAJOR.MINOR.BUILD from the nearest vMAJOR.MINOR tag
 # (cmake/sudoku_version.cmake), which a shallow clone cuts off. The last job, CI, is the one check a ruleset requires:
 # green only when every other job is.
@@ -51,11 +52,6 @@ jobs:
         with:
           fetch-depth: 0
           clean: false
-      - name: The toolkit submodule
-        uses: ./.github/actions/toolkit
-        with:
-          deploy-key: ${{ secrets.RECKLESS_TOOLKIT_DEPLOY_KEY }}
-          require-on-main: "true"
       - name: Tidy the workspace
         run: |
           if ('${{ github.event.inputs.fresh }}' -eq 'true') { 'fresh: removing the kept tree'; Remove-Item -Recurse -Force build/ci -ErrorAction SilentlyContinue }
@@ -114,10 +110,6 @@ jobs:
         with:
           fetch-depth: 0
           clean: false
-      - name: The toolkit submodule
-        uses: ./.github/actions/toolkit
-        with:
-          deploy-key: ${{ secrets.RECKLESS_TOOLKIT_DEPLOY_KEY }}
       - name: Tidy the workspace
         run: |
           if [ "${{ github.event.inputs.fresh }}" = "true" ]; then echo "fresh: removing the kept tree"; rm -rf build/ci-linux; fi
@@ -165,10 +157,6 @@ jobs:
         with:
           fetch-depth: 0
           clean: false
-      - name: The toolkit submodule
-        uses: ./.github/actions/toolkit
-        with:
-          deploy-key: ${{ secrets.RECKLESS_TOOLKIT_DEPLOY_KEY }}
       - name: Tidy the workspace
         run: |
           if [ "${{ github.event.inputs.fresh }}" = "true" ]; then echo "fresh: removing the kept tree"; rm -rf build/release-universal; fi
@@ -243,10 +231,6 @@ jobs:
         with:
           fetch-depth: 0
           clean: false
-      - name: The toolkit submodule
-        uses: ./.github/actions/toolkit
-        with:
-          deploy-key: ${{ secrets.RECKLESS_TOOLKIT_DEPLOY_KEY }}
       - name: Toolchain
         id: cpp
         uses: ./.github/actions/cpp
@@ -278,10 +262,6 @@ jobs:
         with:
           fetch-depth: 0
           clean: false
-      - name: The toolkit submodule
-        uses: ./.github/actions/toolkit
-        with:
-          deploy-key: ${{ secrets.RECKLESS_TOOLKIT_DEPLOY_KEY }}
       - name: Toolchain
         id: cpp
         uses: ./.github/actions/cpp
@@ -313,10 +293,6 @@ jobs:
         with:
           fetch-depth: 0
           clean: false
-      - name: The toolkit submodule
-        uses: ./.github/actions/toolkit
-        with:
-          deploy-key: ${{ secrets.RECKLESS_TOOLKIT_DEPLOY_KEY }}
       - name: Toolchain
         id: cpp
         uses: ./.github/actions/cpp
