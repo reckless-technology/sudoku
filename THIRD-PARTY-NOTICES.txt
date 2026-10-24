@@ -1,9 +1,10 @@
 THIRD-PARTY NOTICES
 
-Reckless Sudoku is copyright (C) 2008-2026 Jonny Reckless and licensed under EULA.txt. Its
-executable, and the puzzles installed beside it, contain the third-party software and data below,
-each part used under its own licence, which this file reproduces wherever the licence asks for it.
-Nothing in EULA.txt limits any right these licences give you.
+Reckless Sudoku is copyright (C) 2008-2026 Jonny Reckless and licensed under the GNU General Public
+License, version 3 or later (LICENSE). Its executable, and the puzzles installed beside it, contain
+the third-party software and data below, each part used under its own licence, which this file
+reproduces wherever the licence asks for it. Nothing in the GPL limits any right these licences give
+you.
 
 Where each part is used
 

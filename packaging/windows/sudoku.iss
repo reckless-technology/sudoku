@@ -52,7 +52,7 @@ AppPublisherURL=https://recklesstechnology.com
 AppCopyright=Copyright (C) 2008-2026 Jonny Reckless
 DefaultGroupName=Reckless Technology
 DisableProgramGroupPage=yes
-LicenseFile={#StageDir}\EULA.txt
+LicenseFile={#StageDir}\LICENSE.txt
 OutputDir={#OutputDir}
 Compression=lzma2/max
 SolidCompression=yes
@@ -81,7 +81,7 @@ Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{
 [Files]
 Source: "{#StageDir}\{#AppExe}"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\puzzles\*.txt"; DestDir: "{app}\puzzles"; Flags: ignoreversion
-Source: "{#StageDir}\EULA.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "{#StageDir}\LICENSE.txt"; DestDir: "{app}"; Flags: ignoreversion
 Source: "{#StageDir}\THIRD-PARTY-NOTICES.txt"; DestDir: "{app}"; Flags: ignoreversion
 
 [Icons]

@@ -147,7 +147,7 @@ builds as 0.0.0, with a warning.
 `packaging/` turns a release build tree into what is shipped, the same way on a pull request's run and a release's:
 
 - `packaging/stage.py <build-dir> <dist-dir> windows|linux|macos` stages the program (`RecklessSudoku.exe`,
-  `reckless-sudoku` or `RecklessSudoku.app`), the puzzle bank (`puzzles/`, in the bundle on macOS), `EULA.txt` and
+  `reckless-sudoku` or `RecklessSudoku.app`), the puzzle bank (`puzzles/`, in the bundle on macOS), `LICENSE.txt` and
   `THIRD-PARTY-NOTICES.txt` into a folder of their own; everything after it reads the stage, and a build tree without
   the whole bank stops it.
 - Windows: `packaging/windows/make_installer.ps1` compiles `sudoku.iss` with Inno Setup 6.7.3 (fetched and held to its
@@ -212,7 +212,7 @@ toolkit's `tools/sign-mac.sh`, when `MACOS_DEVELOPER_ID_APPLICATION_P12` is set)
 
 ## Licence
 
-Reckless Sudoku is proprietary (`LICENSE`); the program is licensed to the people who use it under `EULA.txt`, which
+Reckless Sudoku is free software under the GNU General Public License, version 3 or later (`LICENSE`), which
 every installer shows and carries. The third-party parts the executable contains (Skia with libpng, zlib and, on Linux,
 FreeType; the Noto Serif and Monaspace Xenon typefaces) and the public-domain puzzle bank installed beside it are listed
 with their licences in `THIRD-PARTY-NOTICES.txt`,

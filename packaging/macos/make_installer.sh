@@ -5,7 +5,7 @@
 #
 #   RecklessSudoku.app                  /Applications/Reckless Technology, beside the organisation's other apps; not
 #                                       relocatable, so Installer never follows a copy of the same identifier elsewhere
-#   EULA.txt, THIRD-PARTY-NOTICES.txt   /Library/Documentation/Reckless Sudoku
+#   LICENSE.txt, THIRD-PARTY-NOTICES.txt   /Library/Documentation/Reckless Sudoku
 #   Uninstall Reckless Sudoku.app       beside the program
 #
 # Signed with the Developer ID Installer identity RECKLESS_INSTALLER_IDENTITY names, in RECKLESS_SIGNING_KEYCHAIN where
@@ -20,7 +20,7 @@ dist=$(cd "$1" && pwd)
 version=$2
 out=$3
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "make_installer.sh: the version is MAJOR.MINOR.BUILD, not $version" >&2; exit 2; }
-for file in RecklessSudoku.app EULA.txt THIRD-PARTY-NOTICES.txt; do
+for file in RecklessSudoku.app LICENSE.txt THIRD-PARTY-NOTICES.txt; do
     [ -e "$dist/$file" ] || { echo "make_installer.sh: $dist has no $file: stage it with packaging/stage.py" >&2; exit 1; }
 done
 here=$(cd "$(dirname "$0")" && pwd)
@@ -39,7 +39,7 @@ pkgbuild --root "$work/app-root" --component-plist "$work/app.plist" --install-l
 
 # The licence and the notices.
 mkdir -p "$work/docs-root/Library/Documentation/Reckless Sudoku"
-cp "$dist/EULA.txt" "$dist/THIRD-PARTY-NOTICES.txt" "$work/docs-root/Library/Documentation/Reckless Sudoku/"
+cp "$dist/LICENSE.txt" "$dist/THIRD-PARTY-NOTICES.txt" "$work/docs-root/Library/Documentation/Reckless Sudoku/"
 pkgbuild --root "$work/docs-root" --install-location / --identifier "$id.docs" --version "$version" \
     "$work/docs.pkg" > /dev/null
 
@@ -83,7 +83,7 @@ pkgbuild --root "$work/uninstaller-root" --component-plist "$work/uninstaller.pl
 
 # The product: the licence, the floor, the three parts taken whole.
 mkdir -p "$work/resources"
-cp "$dist/EULA.txt" "$work/resources/EULA.txt"
+cp "$dist/LICENSE.txt" "$work/resources/LICENSE.txt"
 sed -e "s/@VERSION@/$version/g" "$here/distribution.xml.in" > "$work/distribution.xml"
 sign=()
 if [ -n "${RECKLESS_INSTALLER_IDENTITY:-}" ]; then
