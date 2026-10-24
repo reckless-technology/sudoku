@@ -33,7 +33,7 @@ for puzzles in easy.txt medium.txt hard.txt diabolical.txt; do
     cmp -s "$dist/puzzles/$puzzles" "$x/$bank/$puzzles" || fail "the puzzle bank's $puzzles is not the staged one"
     [ "$(stat -c %a "$x/$bank/$puzzles")" = 644 ] || fail "$puzzles is not 0644"
 done
-for doc in EULA.txt THIRD-PARTY-NOTICES.txt; do
+for doc in LICENSE.txt THIRD-PARTY-NOTICES.txt; do
     cmp -s "$dist/$doc" "$x/usr/share/doc/reckless-sudoku/$doc" || fail "$doc is not the staged one"
     [ "$(stat -c %a "$x/usr/share/doc/reckless-sudoku/$doc")" = 644 ] || fail "$doc is not 0644"
 done
@@ -50,7 +50,7 @@ for script in postinst postrm; do
 done
 outside=$(cd "$x" && find . \( -type f -o -type l \) ! -path './DEBIAN/*' | grep -v -x -e './opt/reckless-technology/bin/reckless-sudoku' \
     -e "./usr/share/applications/$id.desktop" -e "./usr/share/icons/hicolor/256x256/apps/$id.png" \
-    -e './usr/share/doc/reckless-sudoku/EULA.txt' -e './usr/share/doc/reckless-sudoku/THIRD-PARTY-NOTICES.txt' \
+    -e './usr/share/doc/reckless-sudoku/LICENSE.txt' -e './usr/share/doc/reckless-sudoku/THIRD-PARTY-NOTICES.txt' \
     -e './usr/share/doc/reckless-sudoku/copyright' -e "./$bank/easy.txt" -e "./$bank/medium.txt" \
     -e "./$bank/hard.txt" -e "./$bank/diabolical.txt" || true)
 [ -z "$outside" ] || fail "files the package should not hold: $outside"

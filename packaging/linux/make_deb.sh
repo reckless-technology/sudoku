@@ -11,7 +11,7 @@
 #   /usr/share/icons/hicolor/256x256/apps/com.recklesstechnology.sudoku.png
 #       the program's icon (assets/icon/icon_256.png, tools/make_icon.py)
 #   /usr/share/doc/reckless-sudoku/
-#       EULA.txt, THIRD-PARTY-NOTICES.txt, copyright
+#       LICENSE.txt, THIRD-PARTY-NOTICES.txt, copyright
 #
 # every file the staged one byte for byte, owned by root, 0755 where it runs and 0644 elsewhere, its time
 # SOURCE_DATE_EPOCH's or the last commit's, so one stage makes one package. Its Depends is read off the binary: every
@@ -28,7 +28,7 @@ dist=$(cd "$1" && pwd)
 version=$2
 out=$3
 [[ "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "make_deb.sh: the version is MAJOR.MINOR.BUILD, not $version" >&2; exit 2; }
-for file in reckless-sudoku puzzles/easy.txt puzzles/medium.txt puzzles/hard.txt puzzles/diabolical.txt EULA.txt \
+for file in reckless-sudoku puzzles/easy.txt puzzles/medium.txt puzzles/hard.txt puzzles/diabolical.txt LICENSE.txt \
     THIRD-PARTY-NOTICES.txt; do
     [ -e "$dist/$file" ] || { echo "make_deb.sh: $dist has no $file: stage it with packaging/stage.py" >&2; exit 1; }
 done
@@ -51,7 +51,7 @@ install -m 0755 "$dist/reckless-sudoku" "$pkg/opt/reckless-technology/bin/reckle
 install -m 0644 "$dist/puzzles/"*.txt "$bank/"
 install -m 0644 "$here/$id.desktop" "$pkg/usr/share/applications/$id.desktop"
 install -m 0644 "$root/assets/icon/icon_256.png" "$pkg/usr/share/icons/hicolor/256x256/apps/$id.png"
-install -m 0644 "$dist/EULA.txt" "$dist/THIRD-PARTY-NOTICES.txt" "$doc/"
+install -m 0644 "$dist/LICENSE.txt" "$dist/THIRD-PARTY-NOTICES.txt" "$doc/"
 cat > "$doc/copyright" <<COPYRIGHT
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Reckless Sudoku
@@ -61,7 +61,7 @@ Source: https://recklesstechnology.com
 Files: *
 Copyright: 2008-2026 Jonny Reckless
 License: proprietary
- Licensed to its users under /usr/share/doc/reckless-sudoku/EULA.txt. The third-party parts it contains are used
+ Licensed to its users under /usr/share/doc/reckless-sudoku/LICENSE.txt. The third-party parts it contains are used
  under the licences /usr/share/doc/reckless-sudoku/THIRD-PARTY-NOTICES.txt reproduces.
 COPYRIGHT
 chmod 0644 "$doc/copyright"

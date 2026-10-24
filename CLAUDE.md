@@ -5,7 +5,7 @@ window, building, tests.
 
 Reckless Sudoku: a Sudoku solved by deduction, a step at a time, C++20, its window on reckless-toolkit (a private
 submodule at `external/reckless-toolkit`, added with its GUI on, its suites, its audio device layer and ASIO off). A
-private repository, proprietary (`LICENSE`; `EULA.txt` for the releases' users). It began as a C# program in 2008; the
+public repository under the GNU General Public License version 3 or later (`LICENSE`). It began as a C# program in 2008; the
 C# is in the history, with the solver's design and its puzzles carried over.
 
 ## Layout

@@ -5,16 +5,16 @@ archive, the installers, the signing - reads the stage, never the build tree.
 
     python3 -I packaging/stage.py <build-dir> <dist-dir> linux|macos|windows
 
-    windows  RecklessSudoku.exe, puzzles/ (the bank's four files), EULA.txt, THIRD-PARTY-NOTICES.txt
-    linux    reckless-sudoku, puzzles/, EULA.txt, THIRD-PARTY-NOTICES.txt - the archive as it is, and what the Debian
+    windows  RecklessSudoku.exe, puzzles/ (the bank's four files), LICENSE.txt, THIRD-PARTY-NOTICES.txt
+    linux    reckless-sudoku, puzzles/, LICENSE.txt, THIRD-PARTY-NOTICES.txt - the archive as it is, and what the Debian
              package lays out
     macos    RecklessSudoku.app (copied with ditto, its signature as the build made it: ad hoc, or a release's Developer
-             ID after packaging/macos/sign.sh), the bank in its Contents/Resources/puzzles, EULA.txt,
+             ID after packaging/macos/sign.sh), the bank in its Contents/Resources/puzzles, LICENSE.txt,
              THIRD-PARTY-NOTICES.txt
 
 The folder is emptied first; a binary the build did not make, or a bank short of a file or of a whole record, stops it
 before anything is copied. The licence is the
-repository's EULA.txt, the one every installer shows; the repository's own LICENSE, which the program's About card
+repository's LICENSE.txt, the one every installer shows; the repository's own LICENSE, which the program's About card
 carries, is not shipped as a file. Any Python 3 runs it, with nothing installed.
 """
 import shutil
@@ -29,7 +29,7 @@ BINARIES = {
     "macos": "src/app/RecklessSudoku.app",
     "windows": "src/app/RecklessSudoku.exe",
 }
-DOCUMENTS = ("EULA.txt", "THIRD-PARTY-NOTICES.txt")
+DOCUMENTS = {"LICENSE": "LICENSE.txt", "THIRD-PARTY-NOTICES.txt": "THIRD-PARTY-NOTICES.txt"}
 # The puzzle bank's files (src/solver/puzzle_bank.h), each a whole number of 100-byte records; where the build puts them,
 # beside the binary or in the bundle's Resources.
 BANK = ("easy.txt", "medium.txt", "hard.txt", "diabolical.txt")
@@ -68,8 +68,8 @@ def main():
         (dist / "puzzles").mkdir()
         for name in BANK:
             shutil.copyfile(build / BANK_FOLDERS[platform_name] / name, dist / "puzzles" / name)
-    for document in DOCUMENTS:
-        shutil.copyfile(ROOT / document, dist / document)
+    for document, staged in DOCUMENTS.items():
+        shutil.copyfile(ROOT / document, dist / staged)
     print(f"staged into {dist}:")
     for path in sorted(dist.rglob("*")):
         relative = path.relative_to(dist).as_posix()

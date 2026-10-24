@@ -235,9 +235,10 @@ def build(build_dir):
         title, used = sections[key][0], sections[key][1]
         rows.append(f"  {n[key]:>2}. {title.split(',')[0]:<44} {used}")
     head = ("THIRD-PARTY NOTICES\n\n" + prose(
-        "Reckless Sudoku is copyright (C) 2008-2026 Jonny Reckless and licensed under EULA.txt. Its executable, and "
+        "Reckless Sudoku is copyright (C) 2008-2026 Jonny Reckless and licensed under the GNU General Public "
+        "License, version 3 or later (LICENSE). Its executable, and "
         "the puzzles installed beside it, contain the third-party software and data below, each part used under its "
-        "own licence, which this file reproduces wherever the licence asks for it. Nothing in EULA.txt limits any right these licences give you.") +
+        "own licence, which this file reproduces wherever the licence asks for it. Nothing in the GPL limits any right these licences give you.") +
         "\n\nWhere each part is used\n\n" + "\n".join(rows) + "\n")
     parts = [head] + [section(n[key], *sections[key]) for key in keys]
     return "\n\n".join(s.rstrip("\n") for s in parts) + "\n"

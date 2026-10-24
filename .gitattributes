@@ -6,6 +6,6 @@
 LICENSE text eol=lf
 THIRD-PARTY-NOTICES.txt text eol=lf
 # The end-user licence every package carries and shows: the same bytes on every platform.
-EULA.txt text eol=lf
+LICENSE text eol=lf
 # The Sudoku Exchange puzzles, as the puzzle bank publishes them: 100-byte records, LF line ends, on every platform.
 puzzles/sudoku_exchange/*.txt -text

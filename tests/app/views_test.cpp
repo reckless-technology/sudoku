@@ -532,7 +532,7 @@ TEST_F(Views, ShowsTheAboutCardAndClosesIt)
     EXPECT_EQ(about.Lines(), (std::vector<std::string>{
                                  "Reckless Sudoku", std::string("Version ") + kVersion,
                                  "Copyright 2008-2026 Jonny Reckless. Reckless Technology.", "recklesstechnology.com",
-                                 "Free, proprietary software, used under its end-user licence (EULA.txt).",
+                                 "Free software under the GNU General Public License, version 3 (LICENSE.txt).",
                                  "Third-party notices are in THIRD-PARTY-NOTICES.txt, installed beside the "
                                  "app."}));
     EXPECT_TRUE(Painted(view).IsValid());

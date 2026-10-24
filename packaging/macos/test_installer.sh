@@ -23,7 +23,7 @@ id=com.recklesstechnology.sudoku
 pkgutil --expand-full "$pkg" "$work/x" > /dev/null
 distribution="$work/x/Distribution"
 grep -q '<os-version min="13.3"/>' "$distribution" || fail "the distribution does not hold the floor 13.3"
-grep -q '<license file="EULA.txt"/>' "$distribution" || fail "the distribution shows no licence"
+grep -q '<license file="LICENSE.txt"/>' "$distribution" || fail "the distribution shows no licence"
 for part in app docs uninstaller; do
     info="$work/x/$part.pkg/PackageInfo"
     [ -f "$info" ] || fail "no $part.pkg in the product"
@@ -41,11 +41,11 @@ for puzzles in easy.txt medium.txt hard.txt diabolical.txt; do
     [ -s "$app/Contents/Resources/puzzles/$puzzles" ] || fail "the app carries no puzzle bank's $puzzles"
 done
 docs="$work/x/docs.pkg/Payload/Library/Documentation/Reckless Sudoku"
-for doc in EULA.txt THIRD-PARTY-NOTICES.txt; do
+for doc in LICENSE.txt THIRD-PARTY-NOTICES.txt; do
     cmp -s "$dist/$doc" "$docs/$doc" || fail "$doc is not the staged one"
 done
 extra=$(cd "$work/x" && find app.pkg/Payload docs.pkg/Payload -type f | grep -v "/RecklessSudoku.app/" |
-    grep -v -e "Library/Documentation/Reckless Sudoku/EULA.txt$" -e "Library/Documentation/Reckless Sudoku/THIRD-PARTY-NOTICES.txt$" || true)
+    grep -v -e "Library/Documentation/Reckless Sudoku/LICENSE.txt$" -e "Library/Documentation/Reckless Sudoku/THIRD-PARTY-NOTICES.txt$" || true)
 [ -z "$extra" ] || fail "files the stage does not hold: $extra"
 
 # The uninstaller: whole, the program's, at the version, not relocatable - and its script, run as the app runs it (an
@@ -73,14 +73,14 @@ other="$stand_in/Applications/Reckless Technology/RecklessIRCapture.app"
 mkdir -p "$other/Contents"
 /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string com.recklesstechnology.ircapture" "$other/Contents/Info.plist" > /dev/null
 other_docs="$stand_in/Library/Documentation/Reckless IR Capture"
-mkdir -p "$other_docs" && echo "a sibling product" > "$other_docs/EULA.txt"
+mkdir -p "$other_docs" && echo "a sibling product" > "$other_docs/LICENSE.txt"
 removed=$(/usr/bin/env -i RECKLESS_UNINSTALL_ROOT="$stand_in" /bin/bash "$uninstaller/Contents/Resources/uninstall.sh")
 [ "$removed" = 2 ] || fail "the uninstaller took off $removed bundles, not the app and itself"
 [ ! -e "$stand_in/Applications/Reckless Technology/RecklessSudoku.app" ] || fail "the uninstaller left the app"
 [ ! -e "$stand_in/Applications/Reckless Technology/Uninstall Reckless Sudoku.app" ] || fail "the uninstaller left itself"
 [ ! -e "$stand_in/Library/Documentation/Reckless Sudoku" ] || fail "the uninstaller left the documents"
 [ -d "$other" ] || fail "the uninstaller took another product's app"
-[ -f "$other_docs/EULA.txt" ] || fail "the uninstaller took another product's documents"
+[ -f "$other_docs/LICENSE.txt" ] || fail "the uninstaller took another product's documents"
 impostor="$stand_in/Applications/Reckless Technology/RecklessSudoku.app"
 mkdir -p "$impostor/Contents"
 /usr/libexec/PlistBuddy -c "Add :CFBundleIdentifier string com.example.impostor" "$impostor/Contents/Info.plist" > /dev/null
