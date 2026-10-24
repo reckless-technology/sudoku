@@ -78,10 +78,12 @@ class BoardView final : public reckless::view::View
 
   private:
     /**
-     * The digit menu at the chosen square: 1 to 9, and Clear.
+     * The digit menu for a square: 1 to 9, and Clear. The square is given rather than read from the picture, which
+     * is only rebuilt on the next frame and so still names the square chosen before this click.
+     * @param cell The square the digits are entered in.
      * @param at Where it opens, in the view.
      */
-    void OfferDigits(reckless::gfx::PointF at);
+    void OfferDigits(int cell, reckless::gfx::PointF at);
 
     BoardPicture                                 picture_;          ///< What it shows.
     std::unique_ptr<reckless::view::MenuSession> menu_;             ///< The digit menu while it is open.

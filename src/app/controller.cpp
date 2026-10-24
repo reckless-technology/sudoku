@@ -18,11 +18,18 @@ Controller::Controller(Settings settings, std::filesystem::path puzzle_bank)
 
 void Controller::Select(int cell)
 {
-    selected_ = std::clamp(cell, 0, geometry::kCellCount - 1);
+    // -1 puts the choice out: a click on the square already chosen, and a puzzle just solved.
+    selected_ = cell < 0 ? -1 : std::clamp(cell, 0, geometry::kCellCount - 1);
 }
 
 void Controller::MoveSelection(int rows, int columns)
 {
+    // With no square chosen the arrows take the middle one, so the keyboard always has somewhere to start.
+    if (selected_ < 0)
+    {
+        selected_ = geometry::Cell(4, 4);
+        return;
+    }
     const int row    = std::clamp(geometry::Row(selected_) + rows, 0, 8);
     const int column = std::clamp(geometry::Column(selected_) + columns, 0, 8);
     selected_        = geometry::Cell(row, column);
@@ -118,7 +125,9 @@ bool Controller::NewPuzzle(puzzle_bank::Band band)
         return false;
     }
     game_.Load(puzzle->givens);
-    file_name_ = name + " " + puzzle->id;
+    // Each new puzzle starts with the pencil marks put away, whatever the last one was left showing.
+    settings_.shows_pencil_marks = false;
+    file_name_                   = name + " " + puzzle->id;
     char rating[16];
     std::snprintf(rating, sizeof rating, "%.1f", puzzle->rating);
     Said(name + " puzzle " + puzzle->id + ", rated " + rating + ", one of " + std::to_string(count) +
@@ -185,7 +194,7 @@ std::string Controller::Headline() const
         return "Solved";
     }
     const int filled = game_.FilledCount();
-    return filled == 0 ? "Enter a puzzle" : std::to_string(filled) + " of 81";
+    return filled == 0 ? "Enter a puzzle" : std::to_string(filled) + " of 81 squares";
 }
 
 std::string Controller::Message() const
@@ -203,9 +212,15 @@ BoardPicture Controller::Picture() const
         picture.is_given[index]   = game_.IsGiven(cell);
         picture.candidates[index] = game_.Candidates(cell);
     }
-    picture.selected           = selected_;
     picture.shows_pencil_marks = settings_.shows_pencil_marks;
     picture.clashes            = game_.clashes();
+    if (game_.IsSolved())
+    {
+        // A solved puzzle is just its numbers: no square chosen, and none of the last step's rings, discs or washes.
+        picture.selected = -1;
+        return picture;
+    }
+    picture.selected = selected_;
     if (shown_step_ && *shown_step_ < game_.steps().size())
     {
         const Step &step = game_.steps()[*shown_step_];

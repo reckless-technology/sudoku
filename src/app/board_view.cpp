@@ -113,9 +113,13 @@ void BoardView::PaintBoard(reckless::gfx::Canvas &c, RectF board, const BoardPic
         }
         c.FillRect(area);
     }
-    const RectF chosen = CellArea(board, picture.selected);
-    c.SetColor(theme::kAmber.WithAlpha(has_focus ? 0.22f : 0.10f));
-    c.FillRect(chosen);
+    // The square chosen, where one is: a click on the square already chosen puts it out, and a solved puzzle has none.
+    if (picture.selected >= 0)
+    {
+        const RectF chosen = CellArea(board, picture.selected);
+        c.SetColor(theme::kAmber.WithAlpha(has_focus ? 0.22f : 0.10f));
+        c.FillRect(chosen);
+    }
 
     // The values, those the lit step read ringed; and the empty squares' pencil marks, those the lit step read on an
     // amber disc, those it struck red.
@@ -196,10 +200,10 @@ void BoardView::PaintBoard(reckless::gfx::Canvas &c, RectF board, const BoardPic
                    RectF{board.x() - 6.0f - band, board.y() + offset, band, side}, reckless::gfx::Justify::kCentred,
                    false);
     }
-    if (has_focus)
+    if (has_focus && picture.selected >= 0)
     {
         c.SetColor(theme::kAmber);
-        c.DrawRect(chosen.Reduced(1.5f), 2.0f);
+        c.DrawRect(CellArea(board, picture.selected).Reduced(1.5f), 2.0f);
     }
 }
 
@@ -216,13 +220,16 @@ void BoardView::MouseDown(const reckless::view::MouseEvent &e)
     {
         return;
     }
+    // A plain click chooses the square, or puts out the one already chosen. A double click or a right click offers
+    // the square's digits, and always leaves it chosen, since the dialog acts on it.
+    const bool does_offer = e.right || e.clicks >= 2;
     if (on_select)
     {
-        on_select(cell);
+        on_select(!does_offer && cell == picture_.selected ? -1 : cell);
     }
-    if (e.right)
+    if (does_offer)
     {
-        OfferDigits(e.position);
+        OfferDigits(cell, e.position);
     }
 }
 
@@ -245,16 +252,23 @@ bool BoardView::KeyPressed(const reckless::view::KeyEvent &key)
     }
     const int  cell = picture_.selected;
     const auto move = [this, cell](int rows, int columns) {
-        const int row    = std::clamp(geometry::Row(cell) + rows, 0, 8);
-        const int column = std::clamp(geometry::Column(cell) + columns, 0, 8);
         if (on_select)
         {
+            // With no square chosen - a click put it out, or the puzzle is solved - an arrow takes the middle one.
+            if (cell < 0)
+            {
+                on_select(geometry::Cell(4, 4));
+                return true;
+            }
+            const int row    = std::clamp(geometry::Row(cell) + rows, 0, 8);
+            const int column = std::clamp(geometry::Column(cell) + columns, 0, 8);
             on_select(geometry::Cell(row, column));
         }
         return true;
     };
     const auto enter = [this, cell](int digit) {
-        if (on_digit)
+        // Nothing to type into with no square chosen.
+        if (on_digit && cell >= 0)
         {
             on_digit(cell, digit);
         }
@@ -300,7 +314,7 @@ void BoardView::FocusLost()
     Repaint();
 }
 
-void BoardView::OfferDigits(PointF at)
+void BoardView::OfferDigits(int cell, PointF at)
 {
     std::vector<reckless::view::MenuItem> items;
     for (int digit = 1; digit <= 9; ++digit)
@@ -317,7 +331,6 @@ void BoardView::OfferDigits(PointF at)
     clear.text = "Clear";
     clear.id   = kClear;
     items.push_back(std::move(clear));
-    const int cell = picture_.selected;
     menu_ = reckless::view::MenuSession::Open(*this, std::move(items), theme::MenuLook(),
                                               {static_cast<int>(at.x), static_cast<int>(at.y)}, [this, cell](int id) {
                                                   menu_.reset();

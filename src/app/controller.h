@@ -19,8 +19,9 @@ namespace sudoku::app
 /** The person's choices that outlive a launch (settings_file.h). */
 struct Settings
 {
-    bool shows_pencil_marks{true}; ///< Whether empty squares show the digits they may take.
-    int  window_percent{100};      ///< The window's size from the View menu, 50 to 150; 100 by default.
+    bool shows_pencil_marks{false}; ///< Whether empty squares show the digits they may take; off until asked
+                                    ///< for (Jonny, 2026-10-23), and off again at each new puzzle.
+    int window_percent{100};        ///< The window's size from the View menu, 50 to 150; 100 by default.
 
     /**
      * @param other Other settings.
@@ -172,7 +173,7 @@ class Controller
 
     Game                       game_;                   ///< The game.
     Settings                   settings_;               ///< The choices kept between launches.
-    int                        selected_{40};           ///< The square chosen.
+    int                        selected_{-1};           ///< The square chosen; -1 for none, as at launch.
     std::optional<std::size_t> shown_step_;             ///< The step lit; none for none.
     std::optional<std::string> message_;                ///< What was last done; none for where the puzzle stands.
     std::string                file_name_;              ///< The puzzle's file name; empty for none.
