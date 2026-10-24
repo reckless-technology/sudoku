@@ -47,7 +47,7 @@ jobs:
   # Which version: the build's own rule, so the release page and the binaries agree by construction.
   verify:
     name: Version from the tags
-    runs-on: [light]
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -135,7 +135,7 @@ jobs:
   linux:
     name: Package Linux
     needs: verify
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
       VERSION: ${{ needs.verify.outputs.version }}
@@ -204,7 +204,7 @@ jobs:
   windows:
     name: Package Windows
     needs: verify
-    runs-on: [self-hosted, Windows, X64]
+    runs-on: windows-2025
     timeout-minutes: 120
     env:
       VERSION: ${{ needs.verify.outputs.version }}
@@ -332,7 +332,7 @@ jobs:
   macos:
     name: Package macOS
     needs: verify
-    runs-on: [self-hosted, macOS, ARM64]
+    runs-on: macos-15
     timeout-minutes: 240
     env:
       VERSION: ${{ needs.verify.outputs.version }}
@@ -460,7 +460,7 @@ jobs:
     name: Check the draft
     if: needs.verify.outputs.draft == 'true'
     needs: [verify, linux, windows, macos]
-    runs-on: [light]
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     env:
       VERSION: ${{ needs.verify.outputs.version }}

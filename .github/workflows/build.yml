@@ -6,8 +6,11 @@ name: build
 # kept), macOS universal (every suite, both slices and the floor of 13.3 held; the installer package, unsigned, kept),
 # each package held to its stage as release.yml holds a release's; the program's line coverage held to 95 % (gcc on
 # Linux); every suite again under AddressSanitizer and UndefinedBehaviorSanitizer, and under ThreadSanitizer; and the C++
-# held to clang-format 22.1.8. The repository is private, so every job runs on the organisation's self-hosted runners
-# (.github/actions/cpp provides the toolchain), the short ones on the runners labelled light. The window is built on the
+# held to clang-format 22.1.8. The repository is public, so every job runs on a GitHub-hosted runner, its image
+# pinned by version (ubuntu-24.04, windows-2025, macos-15) and fresh each job, which costs a public repository
+# nothing; .github/actions/cpp installs what an image lacks. The organisation's self-hosted runners are not used:
+# its runner group does not serve public repositories, and opening it to them would let a fork's pull request run
+# on Jonny's machines. The window is built on the
 # toolkit, a private submodule read through its read-only deploy key (.github/actions/toolkit). Every checkout is whole
 # (fetch-depth 0): the version every binary reports is MAJOR.MINOR.BUILD from the nearest vMAJOR.MINOR tag
 # (cmake/sudoku_version.cmake), which a shallow clone cuts off. The last job, CI, is the one check a ruleset requires:
@@ -38,7 +41,7 @@ env:
 jobs:
   windows:
     name: Windows (MSVC)
-    runs-on: [self-hosted, Windows, X64]
+    runs-on: windows-2025
     timeout-minutes: 120
     defaults:
       run:
@@ -104,7 +107,7 @@ jobs:
   # then the Debian package and the tarball made as release.yml makes them, each held to the stage and kept as artifacts.
   linux:
     name: Linux (gcc)
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v5
@@ -155,7 +158,7 @@ jobs:
   # window server), then the installer package made unsigned as release.yml makes it, held to its stage and kept.
   macos:
     name: macOS (universal)
-    runs-on: [self-hosted, macOS, ARM64]
+    runs-on: macos-15
     timeout-minutes: 120
     steps:
       - uses: actions/checkout@v5
@@ -230,7 +233,7 @@ jobs:
   # space's randomisation off (setarch -R), which their children inherit.
   sanitizers:
     name: Linux sanitizers (address, undefined)
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
       ASAN_OPTIONS: detect_leaks=1:abort_on_error=1
@@ -266,7 +269,7 @@ jobs:
   # as above.
   tsan:
     name: Linux sanitizer (thread)
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ubuntu-24.04
     timeout-minutes: 120
     env:
       TSAN_OPTIONS: halt_on_error=1:second_deadlock_stack=1
@@ -303,7 +306,7 @@ jobs:
   # grid's accessors billions of times, so the threshold is 2^40.
   coverage:
     name: Coverage (Linux, gcc)
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: ubuntu-24.04
     timeout-minutes: 90
     steps:
       - uses: actions/checkout@v5
@@ -369,7 +372,7 @@ jobs:
 
   format:
     name: clang-format
-    runs-on: [light]
+    runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
@@ -393,7 +396,7 @@ jobs:
     name: CI
     needs: [windows, linux, macos, sanitizers, tsan, coverage, format]
     if: always()
-    runs-on: [light]
+    runs-on: ubuntu-24.04
     timeout-minutes: 5
     steps:
       - name: Every job passed
