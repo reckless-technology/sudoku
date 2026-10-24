@@ -25,15 +25,15 @@ enum class MarkLook
 /** What the board shows, made by the controller and drawn by the board's view. */
 struct BoardPicture
 {
-    Values                                 values{};                 ///< Each square's value, 0 while empty.
-    std::array<bool, geometry::kCellCount> is_given{};               ///< Whether each value was entered.
-    std::array<int, geometry::kCellCount>  candidates{};             ///< Each square's pencil marks (digits.h).
-    int                                    selected{40};             ///< The square chosen, which the keys fill.
-    bool                                   shows_pencil_marks{true}; ///< Whether empty squares show their marks.
-    std::vector<int>                       clashes;                  ///< The squares whose givens clash.
-    std::vector<int>                       pattern;                  ///< The lit step's squares.
-    std::vector<int>                       placed;                   ///< The squares the lit step placed values in.
-    std::vector<Candidate>                 struck;                   ///< The candidates the lit step struck.
+    Values                                 values{};     ///< Each square's value, 0 while empty.
+    std::array<bool, geometry::kCellCount> is_given{};   ///< Whether each value was entered.
+    std::array<int, geometry::kCellCount>  candidates{}; ///< Each square's pencil marks (digits.h).
+    int                    selected{-1}; ///< The square chosen, which the keys fill; -1 for none, as at launch.
+    bool                   shows_pencil_marks{true}; ///< Whether empty squares show their marks.
+    std::vector<int>       clashes;                  ///< The squares whose givens clash.
+    std::vector<int>       pattern;                  ///< The lit step's squares.
+    std::vector<int>       placed;                   ///< The squares the lit step placed values in.
+    std::vector<Candidate> struck;                   ///< The candidates the lit step struck.
     std::vector<Candidate> reasons; ///< What the lit step read: pencil marks and values (Step::reasons).
 
     /**

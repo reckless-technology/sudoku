@@ -58,7 +58,7 @@ TEST_F(SettingsFileTest, WhatMakesNoSenseIsTheDefault)
     WriteText(R"({"pencil_marks": "yes", "window_percent": 300})");
     EXPECT_EQ(ReadSettings(file_), Settings{});
     WriteText(R"({"window_percent": 75})");
-    EXPECT_EQ(ReadSettings(file_), (Settings{true, 75}));
+    EXPECT_EQ(ReadSettings(file_), (Settings{false, 75})) << "the marks default to off";
     WriteText("not json");
     EXPECT_EQ(ReadSettings(file_), Settings{});
     WriteText("[1, 2]");
@@ -73,10 +73,10 @@ TEST_F(SettingsFileTest, TheKeeperWritesOnlyWhenTheChoicesChange)
     EXPECT_TRUE(keeper.Changed(read)) << "the first call: the menu's ticks set";
     EXPECT_EQ(keeper.writes(), 0) << "nothing written for what was read";
     EXPECT_FALSE(keeper.Changed(read));
-    EXPECT_TRUE(keeper.Changed(Settings{false, 100}));
+    EXPECT_TRUE(keeper.Changed(Settings{true, 100}));
     EXPECT_EQ(keeper.writes(), 1);
-    EXPECT_EQ(ReadSettings(file_), (Settings{false, 100}));
-    EXPECT_FALSE(keeper.Changed(Settings{false, 100}));
+    EXPECT_EQ(ReadSettings(file_), (Settings{true, 100}));
+    EXPECT_FALSE(keeper.Changed(Settings{true, 100}));
     EXPECT_EQ(keeper.writes(), 1);
 
     SettingsKeeper none({}); // a launch's check: nothing kept

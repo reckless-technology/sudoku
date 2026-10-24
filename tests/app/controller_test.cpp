@@ -53,7 +53,7 @@ TEST(Controller, StartsEmptyAndSaysHowToBegin)
     const Controller controller;
     EXPECT_EQ(controller.Headline(), "Enter a puzzle");
     EXPECT_EQ(controller.Message(), "Choose a square and type a digit, or open a puzzle.");
-    EXPECT_EQ(controller.selected(), geometry::Cell(4, 4));
+    EXPECT_EQ(controller.selected(), -1) << "no square lit until one is chosen";
     EXPECT_TRUE(controller.CanRun());
     EXPECT_FALSE(controller.shown_step().has_value());
 }
@@ -70,15 +70,19 @@ TEST(Controller, MovesTheChosenSquareAndHoldsItToTheBoard)
     EXPECT_EQ(controller.selected(), geometry::Cell(8, 8));
     controller.Select(500);
     EXPECT_EQ(controller.selected(), geometry::kCellCount - 1);
-    controller.Select(-3);
-    EXPECT_EQ(controller.selected(), 0);
+    // A negative square is none chosen: a click on the square already chosen puts the choice out.
+    controller.Select(-1);
+    EXPECT_EQ(controller.selected(), -1);
+    // With none chosen an arrow takes the middle square, so the keyboard always has somewhere to start.
+    controller.MoveSelection(1, 0);
+    EXPECT_EQ(controller.selected(), geometry::Cell(4, 4));
 }
 
 TEST(Controller, ACluePlacesAValueSaysItsStepAndLightsIt)
 {
     Controller controller;
     EnterPuzzle(controller, kXWing);
-    EXPECT_EQ(controller.Headline(), "20 of 81");
+    EXPECT_EQ(controller.Headline(), "20 of 81 squares");
     controller.Clue();
     const Game &game = controller.game();
     ASSERT_FALSE(game.steps().empty());
@@ -86,7 +90,7 @@ TEST(Controller, ACluePlacesAValueSaysItsStepAndLightsIt)
     EXPECT_EQ(controller.Message(), game.steps().back().description);
     ASSERT_TRUE(controller.shown_step().has_value());
     EXPECT_EQ(*controller.shown_step(), game.steps().size() - 1);
-    EXPECT_EQ(controller.Headline(), "21 of 81");
+    EXPECT_EQ(controller.Headline(), "21 of 81 squares");
 
     const BoardPicture picture = controller.Picture();
     const Candidate    placed  = game.steps().back().placements.front();
@@ -131,6 +135,49 @@ TEST(Controller, SolvesAndSaysInHowManySteps)
     EXPECT_EQ(controller.Message(), "Solved in " + std::to_string(controller.game().steps().size()) + " steps.");
     EXPECT_EQ(controller.Headline(), "Solved");
     EXPECT_FALSE(controller.CanRun());
+}
+
+TEST(Controller, NoSquareIsChosenAtLaunch)
+{
+    Controller controller;
+    EXPECT_EQ(controller.selected(), -1) << "nothing lit until a square is clicked or an arrow pressed";
+    EXPECT_EQ(controller.Picture().selected, -1);
+}
+
+TEST(Controller, ASolvedPuzzleIsJustItsNumbers)
+{
+    Controller controller;
+    EnterPuzzle(controller, kXWing);
+    controller.Select(geometry::Cell(3, 3));
+    controller.Clue();
+    // Part way through, the step it lit is drawn: its squares, what it placed and what it read.
+    const BoardPicture lit = controller.Picture();
+    EXPECT_GE(lit.selected, 0);
+    EXPECT_FALSE(lit.pattern.empty());
+    EXPECT_FALSE(lit.placed.empty());
+
+    controller.Solve();
+    ASSERT_TRUE(controller.game().IsSolved());
+    // Solved, it is the numbers alone: no square chosen, and none of the last step's rings, discs or washes.
+    const BoardPicture solved = controller.Picture();
+    EXPECT_EQ(solved.selected, -1);
+    EXPECT_TRUE(solved.pattern.empty());
+    EXPECT_TRUE(solved.placed.empty());
+    EXPECT_TRUE(solved.struck.empty());
+    EXPECT_TRUE(solved.reasons.empty());
+    for (int cell = 0; cell < geometry::kCellCount; ++cell)
+    {
+        EXPECT_FALSE(solved.IsReasonValue(cell)) << "square " << cell << " is still ringed";
+    }
+}
+
+TEST(Controller, ThePencilMarksStartPutAway)
+{
+    Controller controller;
+    EXPECT_FALSE(controller.settings().shows_pencil_marks) << "off until asked for";
+    controller.SetPencilMarks(true);
+    EXPECT_TRUE(controller.settings().shows_pencil_marks);
+    EXPECT_TRUE(controller.Picture().shows_pencil_marks);
 }
 
 TEST(Controller, SaysWhyASolveStopsShort)
@@ -379,7 +426,7 @@ TEST(Menus, TickAndEnableAsThePuzzleStands)
     };
     ASSERT_NE(find(kUndo), nullptr);
     EXPECT_FALSE(find(kUndo)->enabled);
-    EXPECT_TRUE(find(kPencilMarks)->checked);
+    EXPECT_FALSE(find(kPencilMarks)->checked) << "the marks start put away";
     EXPECT_TRUE(find(kClue)->enabled);
 
     controller.Enter(0, 5);
@@ -422,7 +469,7 @@ TEST(Menus, RunTheirCommands)
     RunCommand(kUndo, controller, handlers, window);
     EXPECT_TRUE(controller.game().steps().empty());
     RunCommand(kPencilMarks, controller, handlers, window);
-    EXPECT_FALSE(controller.settings().shows_pencil_marks);
+    EXPECT_TRUE(controller.settings().shows_pencil_marks) << "the command turns them over, from off";
     RunCommand(kSolve, controller, handlers, window);
     EXPECT_TRUE(controller.game().IsSolved());
     RunCommand(kClue, controller, handlers, window); // solved: nothing to find

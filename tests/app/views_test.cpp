@@ -400,15 +400,15 @@ TEST_F(Views, ThePanelTellsEveryPlateAndDimsWhatCannotBeDone)
     Controller controller;
     controller.Enter(0, 5);
     panel.Show(controller);
-    EXPECT_EQ(panel.headline(), "1 of 81");
+    EXPECT_EQ(panel.headline(), "1 of 81 squares");
     EXPECT_FALSE(panel.plate("Undo")->dimmed());
-    EXPECT_TRUE(panel.plate("Pencil marks")->on());
+    EXPECT_FALSE(panel.plate("Pencil marks")->on()) << "the marks start put away";
     for (const char *caption : {"Clue", "Solve", "Check", "Undo", "Clear", "Pencil marks"})
     {
         ASSERT_NE(panel.plate(caption), nullptr) << caption;
         Press(*panel.plate(caption));
     }
-    EXPECT_EQ(told, (std::vector<std::string>{"clue", "solve", "check", "undo", "clear", "marks off"}));
+    EXPECT_EQ(told, (std::vector<std::string>{"clue", "solve", "check", "undo", "clear", "marks on"}));
     EXPECT_EQ(panel.plate("Nothing"), nullptr);
 
     controller.Enter(8, 5);
