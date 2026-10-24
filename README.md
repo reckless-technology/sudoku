@@ -83,8 +83,10 @@ PNG, and the app's icon at any size (`tools/make_icon.py` packs it into `assets/
 
 ## Building
 
-The window is built on reckless-toolkit, a private git submodule at `external/reckless-toolkit`; `-DSUDOKU_GUI=OFF`
-builds the solver and its suite alone, with no submodule. The build fetches the Sudoku Exchange puzzle bank
+The window is built on reckless-toolkit, free software under the GPL, whose files are a git subtree in this
+repository at `external/reckless-toolkit` - committed here, so a clone has them and every commit builds on
+its own. `tools/toolkit-pull.sh` brings its head in; it is pulled, never edited here. `-DSUDOKU_GUI=OFF`
+builds the solver and its suite alone, without it. The build fetches the Sudoku Exchange puzzle bank
 (`cmake/sudoku_puzzle_bank.cmake`: its four files, 89 MB, at the commit the sample was taken from, each held to its
 SHA-256) once into the fetches' folder, and puts it beside the program - `puzzles/` beside the executable, or the
 bundle's `Contents/Resources/puzzles` on macOS; `-DSUDOKU_PUZZLE_BANK=OFF` builds without it.
@@ -93,7 +95,6 @@ On Windows, in Visual Studio's developer environment (`VsDevCmd.bat -arch=x64 -h
 Ninja:
 
 ```
-git submodule update --init                      # the toolkit, external/reckless-toolkit (private)
 cmake --preset release && cmake --build --preset release && ctest --preset release
 build/release/src/app/RecklessSudoku.exe
 ```
@@ -120,7 +121,7 @@ later.
   (Pillow); the build takes them from there and needs no Python.
 - `python3 tools/third_party_notices.py build/release` writes `THIRD-PARTY-NOTICES.txt` from the build tree's fetches
   and the toolkit's pins (any Python 3, nothing installed); the CTest `notices` runs it with `--check` and fails when the
-  committed file is not what it writes. Run it when the submodule moves, and read the diff.
+  committed file is not what it writes. Run it when the toolkit moves, and read the diff.
 - C++ is formatted with clang-format 22.1.8 (`.clang-format`), which the pre-commit hook and CI check. In a fresh clone:
   `git config core.hooksPath .githooks`.
 
@@ -192,7 +193,7 @@ the runners labelled `light`), on every push to `main`, every pull request and b
 - `CI` is green only when every job above is: the one check a ruleset requires.
 
 The artifacts are kept for 30 days. A newer push to a pull request cancels its older run; every commit on `main` keeps
-its own. The toolkit submodule is read through its read-only deploy key, the secret `RECKLESS_TOOLKIT_DEPLOY_KEY`.
+its own. The toolkit needs no checkout of its own and no key: its files are in this repository.
 
 ## Releases
 

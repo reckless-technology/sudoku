@@ -3,8 +3,8 @@
 Guidance for Claude Code in this repository. The README is the long-form reference: using it, how it solves, the
 window, building, tests.
 
-Reckless Sudoku: a Sudoku solved by deduction, a step at a time, C++20, its window on reckless-toolkit (a private
-submodule at `external/reckless-toolkit`, added with its GUI on, its suites, its audio device layer and ASIO off). A
+Reckless Sudoku: a Sudoku solved by deduction, a step at a time, C++20, its window on reckless-toolkit (a git subtree
+at `external/reckless-toolkit`, built with its GUI on, its suites, its audio device layer and ASIO off). A
 public repository under the GNU General Public License version 3 or later (`LICENSE`). It began as a C# program in 2008; the
 C# is in the history, with the solver's design and its puzzles carried over.
 
@@ -49,9 +49,9 @@ C# is in the history, with the solver's design and its puzzles carried over.
 - Every commit authored and committed as `Jonny Reckless <jonny@recklesstechnology.com>`
   (`git config core.hooksPath .githooks` installs the hooks that check it). Work on a branch, open a pull request, merge
   when CI is green.
-- CI runs on the organisation's self-hosted runners (the repository is private), reading the toolkit through the
-  read-only deploy key whose private half is the secret `RECKLESS_TOOLKIT_DEPLOY_KEY`. A bump of the submodule points
-  at a commit on the toolkit's `main`.
+- CI runs on GitHub's hosted runners, as a public repository must, and fetches nothing of its own: the toolkit's
+  files are a subtree here. `tools/toolkit-pull.sh` brings its head in, and it is pulled, never edited in this
+  repository - an edit here would be invisible to the toolkit and to the three other products that share it.
 - Every new behaviour gets a test; the solver's soundness is held by the puzzle and technique suites, which must stay
   green: a step that strikes a solution's candidate is a bug, never a flaky test.
 - No releases, tags or promotions without Jonny's word.
