@@ -11,8 +11,8 @@ Skia's own code with its colour management (skcms) and its PNG decoder, libpng a
 Chromium authors', and on Linux FreeType - and the two typefaces it carries, Noto Serif for the interface and Monaspace
 Xenon for the pencil marks - and the puzzle bank installed beside it, the Sudoku Exchange's, whose commit is read from
 cmake/sudoku_puzzle_bank.cmake and whose licence from the repository's sample of it. Of the toolkit's other fetches none is in the executable: Monocypher (the licence check) and
-the audio file decoders (dr_libs, stb) have nothing of theirs linked, the audio device layer (RtAudio, RtMidi) and the
-ASIO SDK are not built (RECKLESS_BUILD_AUDIO is off), and GoogleTest is the suites' alone. The skia-pack carries the
+the audio file decoders (dr_libs, stb) have nothing of theirs linked, the audio device layer and the ASIO SDK are
+not built (RECKLESS_BUILD_AUDIO is off), and GoogleTest is the suites' alone. The skia-pack carries the
 licences of libpng, zlib and FreeType, read from it here; Skia's own and the Chromium source tree's, which the pack
 lacks, are fetched by the toolkit beside it (external/reckless-toolkit/skia/CMakeLists.txt) and read from there. The
 four platforms' packs carry the same files, so the notices are the same from any build tree; a licence file the pack
