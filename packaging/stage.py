@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """What a release ships, staged from a release build tree into a folder of its own: the program as the build made it,
-the puzzle bank it offers new puzzles from, its end-user licence and the third-party notices. Everything after it - the
+the puzzle bank it offers new puzzles from, its licence and the third-party notices. Everything after it - the
 archive, the installers, the signing - reads the stage, never the build tree.
 
     python3 -I packaging/stage.py <build-dir> <dist-dir> linux|macos|windows
@@ -14,8 +14,8 @@ archive, the installers, the signing - reads the stage, never the build tree.
 
 The folder is emptied first; a binary the build did not make, or a bank short of a file or of a whole record, stops it
 before anything is copied. The licence is the
-repository's LICENSE.txt, the one every installer shows; the repository's own LICENSE, which the program's About card
-carries, is not shipped as a file. Any Python 3 runs it, with nothing installed.
+repository's LICENSE, named LICENSE.txt so every system opens it as text: the one every installer shows. Any Python 3
+runs it, with nothing installed.
 """
 import shutil
 import subprocess

@@ -152,7 +152,7 @@ builds as 0.0.0, with a warning.
   `THIRD-PARTY-NOTICES.txt` into a folder of their own; everything after it reads the stage, and a build tree without
   the whole bank stops it.
 - Windows: `packaging/windows/make_installer.ps1` compiles `sudoku.iss` with Inno Setup 6.7.3 (fetched and held to its
-  hash with `-Fetch`) into `reckless-sudoku-<version>-win64-setup.exe`. It shows the end-user licence, then installs for
+  hash with `-Fetch`) into `reckless-sudoku-<version>-win64-setup.exe`. It shows the licence, then installs for
   the current user by default, under the user's Programs folder in `Reckless Technology\Sudoku`, or, at the dialog's
   choice, for every user under `Program Files\Reckless Technology\Sudoku`, beside the organisation's other products,
   with a Start-menu entry in the shared `Reckless Technology` group. Its uninstaller takes away what it installed and
@@ -160,7 +160,7 @@ builds as 0.0.0, with a warning.
   the installed program for its launch check, installs it again over itself and uninstalls it, with two sibling
   products' folders beside it left as they were.
 - macOS: `packaging/macos/make_installer.sh` makes `reckless-sudoku-<version>-macos.pkg`, for macOS 13.3 and later on
-  either kind of Mac: the end-user licence shown, then `RecklessSudoku.app` and `Uninstall Reckless Sudoku.app` in
+  either kind of Mac: the licence shown, then `RecklessSudoku.app` and `Uninstall Reckless Sudoku.app` in
   `/Applications/Reckless Technology`, the licence and the notices in `/Library/Documentation/Reckless Sudoku`. The
   uninstaller asks, then removes those (each bundle only when its identifier is the program's) and the package's
   receipts, removes the shared folder only when it is empty, and removes the person's settings only if asked.

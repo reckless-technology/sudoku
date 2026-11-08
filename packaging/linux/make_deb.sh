@@ -56,13 +56,30 @@ cat > "$doc/copyright" <<COPYRIGHT
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: Reckless Sudoku
 Upstream-Contact: Jonny Reckless <hello@recklesstechnology.com>
-Source: https://recklesstechnology.com
+Source: https://github.com/reckless-technology/sudoku
+Comment: The third-party parts the program contains are used under the licences
+ /usr/share/doc/reckless-sudoku/THIRD-PARTY-NOTICES.txt reproduces.
 
 Files: *
 Copyright: 2008-2026 Jonny Reckless
-License: proprietary
- Licensed to its users under /usr/share/doc/reckless-sudoku/LICENSE.txt. The third-party parts it contains are used
- under the licences /usr/share/doc/reckless-sudoku/THIRD-PARTY-NOTICES.txt reproduces.
+License: GPL-3.0-or-later
+
+Files: opt/reckless-technology/share/reckless-sudoku/puzzles/*
+Copyright: none: the Sudoku Exchange puzzle bank's authors dedicated it to the public domain
+License: public-domain
+ The Sudoku Exchange "Puzzle Bank" (https://github.com/grantm/sudoku-exchange-puzzle-bank), unchanged; its
+ dedication is reproduced in /usr/share/doc/reckless-sudoku/THIRD-PARTY-NOTICES.txt.
+
+License: GPL-3.0-or-later
+ This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later
+ version.
+ .
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ .
+ The licence's full text is in /usr/share/doc/reckless-sudoku/LICENSE.txt; on Debian systems it is also in
+ /usr/share/common-licenses/GPL-3.
 COPYRIGHT
 chmod 0644 "$doc/copyright"
 

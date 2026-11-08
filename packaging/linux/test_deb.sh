@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
 # The Debian package held to the stage it was made from, with no root and nothing installed: its control fields, every
-# staged file byte for byte at its place with its mode (the puzzle bank in share/reckless-sudoku beside bin), the menu
-# entry (desktop-file-validate where it is installed) and the icon, its md5sums, nothing outside its own files, and
-# every library the binary needs owned by a package its Depends names.
+# staged file byte for byte at its place with its mode (the puzzle bank in share/reckless-sudoku beside bin), its
+# copyright file (GPL-3.0-or-later, its Source this repository), the menu entry (desktop-file-validate where it is
+# installed) and the icon, its md5sums, nothing outside its own files, and every library the binary needs owned by a
+# package its Depends names.
 #
 #   packaging/linux/test_deb.sh <dist-dir> <version> <deb>
 set -euo pipefail
 
-[ $# -eq 3 ] || { sed -n '2,7p' "$0" >&2; exit 2; }
+[ $# -eq 3 ] || { sed -n '2,8p' "$0" >&2; exit 2; }
 dist=$(cd "$1" && pwd)
 version=$2
 deb=$3
@@ -37,7 +38,13 @@ for doc in LICENSE.txt THIRD-PARTY-NOTICES.txt; do
     cmp -s "$dist/$doc" "$x/usr/share/doc/reckless-sudoku/$doc" || fail "$doc is not the staged one"
     [ "$(stat -c %a "$x/usr/share/doc/reckless-sudoku/$doc")" = 644 ] || fail "$doc is not 0644"
 done
-[ -s "$x/usr/share/doc/reckless-sudoku/copyright" ] || fail "no copyright file"
+copyright="$x/usr/share/doc/reckless-sudoku/copyright"
+[ -s "$copyright" ] || fail "no copyright file"
+grep -qx "Source: https://github.com/reckless-technology/sudoku" "$copyright" ||
+    fail "the copyright file's Source is not the public repository"
+grep -qx "License: GPL-3.0-or-later" "$copyright" || fail "the copyright file licenses it under something else"
+! grep -qi "proprietary" "$copyright" || fail "the copyright file calls it proprietary"
+echo "copyright:" && sed 's/^/    /' "$copyright"
 cmp -s "$root/assets/icon/icon_256.png" "$x/usr/share/icons/hicolor/256x256/apps/$id.png" ||
     fail "the icon is not assets/icon/icon_256.png"
 desktop="$x/usr/share/applications/$id.desktop"

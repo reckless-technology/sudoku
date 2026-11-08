@@ -4,7 +4,7 @@
 # Mac taken off it again, and nothing of the other Reckless products that share the folder -
 #   - RecklessSudoku.app and this uninstaller in /Applications/Reckless Technology, and the folder when nothing else is
 #     left in it;
-#   - the end-user licence and the notices in /Library/Documentation/Reckless Sudoku;
+#   - the licence and the notices in /Library/Documentation/Reckless Sudoku;
 #   - and the installer's three receipts (pkgutil --forget), so the system no longer counts the parts as installed.
 # A bundle goes only when its identifier is the program's own (com.recklesstechnology.sudoku), so nothing else that
 # happens to share a name is touched. The settings are the person's: the app removes them as the person, if asked. It prints

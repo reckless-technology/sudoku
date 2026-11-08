@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # The macOS installer held to the stage it was made from, with nothing installed and no root: expanded whole, each part
 # at its version and identifier, its payload exactly the staged files byte for byte at their places (the puzzle bank in
-# the app's Resources), the app not relocatable, the distribution's floor and end-user licence; the uninstaller whole,
+# the app's Resources), the app not relocatable, the distribution's floor and licence; the uninstaller whole,
 # the program's, and its script run on the payloads laid out as a stand-in for / - taking off the program and leaving
 # another product's app beside it, and a bundle at the program's place that is not the program; and with --signed, the
 # product's signature a Developer ID Installer's and the app's and the uninstaller's Developer ID Application's with the
