@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # The portable Linux archive of a staged release (packaging/stage.py linux): the stage whole in one folder,
-# reckless-sudoku-<version>-linux-x64/ - the program, its end-user licence and the notices - in a tar.xz with every
+# reckless-sudoku-<version>-linux-x64/ - the program, its licence and the notices - in a tar.xz with every
 # file's mode kept, so the program stays executable once unpacked, owned by no one in particular (root, numerically) and
 # dated by SOURCE_DATE_EPOCH's or the last commit's time, so one stage makes one archive. Then the archive is held to
 # the stage: unpacked into a folder of its own, every file the staged one byte for byte with its execute bits, and

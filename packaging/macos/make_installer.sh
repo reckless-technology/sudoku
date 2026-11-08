@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # The macOS installer of a staged release (packaging/stage.py macos, signed by packaging/macos/sign.sh for a signed
-# release): a product package made with pkgbuild and productbuild - the end-user licence shown, then three parts every
+# release): a product package made with pkgbuild and productbuild - the licence shown, then three parts every
 # install takes:
 #
 #   RecklessSudoku.app                  /Applications/Reckless Technology, beside the organisation's other apps; not

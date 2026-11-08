@@ -1,7 +1,7 @@
 ; The Windows installer of a staged release (packaging/stage.py windows), compiled by packaging/windows/make_installer.ps1
 ; with Inno Setup 6:
 ;   ISCC /DSudokuVersion=<MAJOR.MINOR.BUILD> /DStageDir=<dist> /DOutputDir=<out> packaging\windows\sudoku.iss
-; The program, the puzzle bank it offers new puzzles from (puzzles\ beside it), its end-user licence (shown before
+; The program, the puzzle bank it offers new puzzles from (puzzles\ beside it), its licence (shown before
 ; anything is installed) and the third-party notices, a Start-menu entry and an uninstaller. A per-user install by default (no administrator asked, under the user's Programs folder:
 ; Reckless Technology\Sudoku there); the dialog offers a machine-wide one, under Program Files\Reckless Technology\Sudoku,
 ; beside the organisation's other products. The uninstaller takes away what the installer put there and nothing else:
