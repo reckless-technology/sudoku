@@ -19,6 +19,8 @@ endif()
 
 # The version, MAJOR.MINOR.BUILD, from the nearest vMAJOR.MINOR tag and the commits since it (cmake/sudoku_version.cmake).
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+# The toolkit's retrying downloads (RecklessDownload.cmake), found here whether or not the toolkit itself is added.
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/external/reckless-toolkit/cmake")
 include(sudoku_version)
 
 project(RecklessSudoku VERSION ${SUDOKU_VERSION} LANGUAGES C CXX)
@@ -114,9 +116,10 @@ if(SUDOKU_BUILD_TESTS)
     set(BUILD_GMOCK OFF CACHE BOOL "" FORCE)
     set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
     set(gtest_force_shared_crt OFF CACHE BOOL "" FORCE)
-    FetchContent_Declare(googletest
-        URL      https://github.com/google/googletest/archive/refs/tags/v1.17.0.tar.gz
-        URL_HASH SHA256=65fab701d9829d38cb77c14acdc431d2108bfdbf8979e40eb8ae567edf10b27c)
+    include(RecklessDownload)
+    reckless_fetch_content(googletest
+        https://github.com/google/googletest/archive/refs/tags/v1.17.0.tar.gz
+        65fab701d9829d38cb77c14acdc431d2108bfdbf8979e40eb8ae567edf10b27c)
     FetchContent_MakeAvailable(googletest)
     include(GoogleTest)
     # googletest compiles its own two libraries under its own strict set (/WX on clang-cl), where clang 21's

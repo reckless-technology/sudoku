@@ -4,6 +4,7 @@
 # SUDOKU_PUZZLE_BANK_FILES to the four files' paths.
 
 include(FetchContent) # for FETCHCONTENT_BASE_DIR
+include(RecklessDownload)
 
 set(SUDOKU_PUZZLE_BANK_COMMIT d8c8ebaee0c08c412cfba96af1923dfa61c83317)
 set(sudoku_puzzle_bank_bands easy medium hard diabolical)
@@ -26,16 +27,15 @@ foreach(band hash IN ZIP_LISTS sudoku_puzzle_bank_bands sudoku_puzzle_bank_hashe
     endif()
     if(NOT is_current)
         # Fetched beside the file and moved over it whole, so a broken download never stands as the file.
-        message(STATUS "Fetching the Sudoku Exchange puzzle bank's ${band}.txt")
-        file(DOWNLOAD
-             "https://raw.githubusercontent.com/grantm/sudoku-exchange-puzzle-bank/${SUDOKU_PUZZLE_BANK_COMMIT}/${band}.txt"
-             "${file}.part" EXPECTED_HASH SHA256=${hash} TLS_VERIFY ON STATUS status)
-        list(GET status 0 code)
-        if(NOT code EQUAL 0)
+        message(STATUS "Fetching the Sudoku Exchange puzzle bank's ${band}.txt (-DSUDOKU_PUZZLE_BANK=OFF builds without it)")
+        reckless_download(
+            "https://raw.githubusercontent.com/grantm/sudoku-exchange-puzzle-bank/${SUDOKU_PUZZLE_BANK_COMMIT}/${band}.txt"
+            "${file}.part")
+        file(SHA256 "${file}.part" actual)
+        if(NOT actual STREQUAL hash)
             file(REMOVE "${file}.part")
-            list(GET status 1 reason)
-            message(FATAL_ERROR "The Sudoku Exchange puzzle bank's ${band}.txt could not be fetched (${reason}). Build "
-                                "without it, the app offering no new puzzles, with -DSUDOKU_PUZZLE_BANK=OFF.")
+            message(FATAL_ERROR "The Sudoku Exchange puzzle bank's ${band}.txt is not the pinned file: its SHA256 is "
+                                "${actual}, the pin is ${hash}. Build without the bank with -DSUDOKU_PUZZLE_BANK=OFF.")
         endif()
         file(RENAME "${file}.part" "${file}")
     endif()
