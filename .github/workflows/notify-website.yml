@@ -5,8 +5,8 @@
 # manifest from the newest public release as it deploys; this sends it a `sudoku-release` repository_dispatch so that
 # happens now rather than at its daily run, which remains the fallback if this fails or is never run.
 #
-# Needs the secret WEBSITE_DISPATCH_TOKEN: a fine-grained personal access token with Contents write on
-# reckless-technology/website alone. The built-in GITHUB_TOKEN cannot dispatch to another repository, and a
+# Needs the organisation secret PUBLIC_RELEASES_TOKEN: a fine-grained token of Jonny's with Contents read and write
+# on website and the public release repositories. The built-in GITHUB_TOKEN cannot dispatch to another repository, and a
 # repository_dispatch needs write access to the target's contents.
 #
 # Also runnable by hand (workflow_dispatch) to wake the website without a release.
@@ -25,11 +25,11 @@ jobs:
     steps:
       - name: The website told
         env:
-          GH_TOKEN: ${{ secrets.WEBSITE_DISPATCH_TOKEN }}
+          GH_TOKEN: ${{ secrets.PUBLIC_RELEASES_TOKEN }}
         run: |
           set -euo pipefail
           if [ -z "$GH_TOKEN" ]; then
-            echo "::error::the secret WEBSITE_DISPATCH_TOKEN is not set; set it to a fine-grained token with Contents write on reckless-technology/website (the website's daily deploy will still pick the release up)"
+            echo "::error::the organisation secret PUBLIC_RELEASES_TOKEN is not set; it is a fine-grained token of Jonny's with Contents read and write on website and the public release repositories (the website's daily deploy will still pick the release up)"
             exit 1
           fi
           gh api repos/reckless-technology/website/dispatches -f event_type=sudoku-release
