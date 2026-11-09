@@ -30,8 +30,8 @@ constexpr int kSectionGap   = 16;  ///< Above the notices' line.
 
 constexpr const char *kName      = "Reckless Sudoku";
 constexpr const char *kCopyright = "Copyright 2008-2026 Jonny Reckless. Reckless Technology.";
-constexpr const char *kTerms     = "Free software under the GNU General Public License, version 3 (LICENSE.txt).";
-constexpr const char *kNotices   = "Third-party notices are in THIRD-PARTY-NOTICES.txt, installed beside the app.";
+constexpr const char *kTerms = "Free software under the GNU General Public License, version 3 or later (LICENSE.txt).";
+constexpr const char *kNotices = "Third-party notices are in THIRD-PARTY-NOTICES.txt, installed beside the app.";
 
 /** @return The link's font: the body face at the body text's size. */
 reckless::gfx::Font LinkFont()
