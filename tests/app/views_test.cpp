@@ -529,12 +529,13 @@ TEST_F(Views, ShowsTheAboutCardAndClosesIt)
     view.SetOverlay(&about);
     EXPECT_EQ(view.overlay(), &about);
     EXPECT_EQ(about.bounds(), view.LocalBounds());
-    EXPECT_EQ(about.Lines(), (std::vector<std::string>{
-                                 "Reckless Sudoku", std::string("Version ") + kVersion,
-                                 "Copyright 2008-2026 Jonny Reckless. Reckless Technology.", "recklesstechnology.com",
-                                 "Free software under the GNU General Public License, version 3 (LICENSE.txt).",
-                                 "Third-party notices are in THIRD-PARTY-NOTICES.txt, installed beside the "
-                                 "app."}));
+    EXPECT_EQ(about.Lines(),
+              (std::vector<std::string>{
+                  "Reckless Sudoku", std::string("Version ") + kVersion,
+                  "Copyright 2008-2026 Jonny Reckless. Reckless Technology.", "recklesstechnology.com",
+                  "Free software under the GNU General Public License, version 3 or later (LICENSE.txt).",
+                  "Third-party notices are in THIRD-PARTY-NOTICES.txt, installed beside the "
+                  "app."}));
     EXPECT_TRUE(Painted(view).IsValid());
 
     // The website's link, lit under the pointer and opened when clicked; nothing opened with no one to open it.
