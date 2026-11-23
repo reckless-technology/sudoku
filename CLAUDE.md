@@ -43,7 +43,8 @@ C# is in the history, with the solver's design and its puzzles carried over.
 
 - File and directory names lower_snake_case (Jonny's rule for every repository); classes and functions PascalCase,
   members `snake_case_`, constants `kPascalCase`, booleans `is`/`has`/`can`/`may`/`do`/`does`, names spelled out;
-  `/** */` on declarations with `@param`/`@return`, `///<` on members; British spelling in comments and documents,
+  `/** */` on declarations with `@param`/`@return`, `///<` on members;
+  American spelling in comments, documents and identifiers,
   which describe the code as it is.
 - `.clang-format` is pawnstar's; clang-format 22.1.8 only (the pre-commit hook and CI check it).
 - Every commit authored and committed as `Jonny Reckless <jonny@recklesstechnology.com>`
